@@ -18,7 +18,6 @@
 #ifndef _imu_h_
 #define _imu_h_
 
-#include <stdint.h> // Needed for uint8_t, uint16_t etc.
 #include <Kalman.h>
 
 extern Kalman kalman;

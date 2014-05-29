@@ -15,13 +15,14 @@
  e-mail   :  kristianl@tkjelectronics.com
 */
 
-#include "I2C.h"
 #include <Arduino.h>
 #include <Wire.h> // Standard Arduino I2C library
 
+#include "I2C.h"
+
 static const uint16_t I2C_TIMEOUT = 100; // Used to check for errors in I2C communication
 
-void initI2C() {
+void initI2c() {
   Wire.begin();
   TWBR = ((F_CPU / 400000L) - 16) / 2; // Set I2C frequency to 400kHz
 }

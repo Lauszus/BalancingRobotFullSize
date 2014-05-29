@@ -15,8 +15,75 @@
  e-mail   :  kristianl@tkjelectronics.com
 */
 
-/* This file is needed, so it will compile using the Arduino IDE */
-
-#include <Wire.h> // Standard Arduino I2C library
+#include <Arduino.h>
+#include <Wire.h>
 #include <Kalman.h>
-#include <avrpins.h>
+
+#include "BalancingRobotFullSize.h"
+#include "avrpins.h"
+#include "Motor.h"
+#include "IMU.h"
+#include "EEPROM.h"
+#include "Protocol.h"
+#include "PID.h"
+
+double pitch; // Angle of the robot
+
+/* Used for timing */
+uint32_t kalmanTimer; // Timer used for the Kalman filter
+static uint32_t pidTimer; // Timer used for the PID loop
+
+static bool layingDown;
+
+void setup() {
+  /* Setup buzzer pin */
+  buzzer::SetDirWrite();
+
+  /* Read the PID values, target angle and other saved values in the EEPROM */
+  if (!checkEEPROMVersion())
+    readEEPROMValues(); // Only read the EEPROM values if they have not been restored
+  else { // Indicate that the EEPROM values have been reset by turning on the buzzer
+    buzzer::Set();
+    delay(1000);
+    buzzer::Clear();
+    delay(100); // Wait a little after the pin is cleared
+  }
+
+  initSerial();
+  initMotors();
+  initIMU();
+
+  /* Beep to indicate that it is now ready */
+  buzzer::Set();
+  delay(100);
+  buzzer::Clear();
+
+  /* Setup timing */
+  kalmanTimer = micros();
+  pidTimer = kalmanTimer;
+}
+
+void loop () {
+  // TODO: Check motor diagnostic pins
+
+  // TODO: if (newValues) {
+  updateAngle();
+
+  /* Drive motors */
+  uint32_t timer = micros();
+  // If the robot is laying down, it has to be put in a vertical position before it starts balancing
+  // If it's already balancing it has to be ±45 degrees before it stops trying to balance
+  if ((layingDown && (pitch < cfg.targetAngle - 5 || pitch > cfg.targetAngle + 5)) || (!layingDown && (pitch < cfg.targetAngle - 45 || pitch > cfg.targetAngle + 45))) {
+    layingDown = true; // The robot is in a unsolvable position, so turn off both motors and wait until it's vertical again
+    stopAndReset();
+  } else {
+    layingDown = false; // It's no longer laying down
+    double turning = analogRead(A1) / 204.6 - 2.5;
+    Serial.println(turning);
+    turning *= 30;
+    updatePID(cfg.targetAngle, turning, 0 /*turningOffset*/, (double)(timer - pidTimer) / 1000000.0);
+  }
+  pidTimer = timer;
+
+  parseSerialData();
+}

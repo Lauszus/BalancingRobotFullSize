@@ -18,10 +18,7 @@
 #ifndef _balancingrobotfullsize_h_
 #define _balancingrobotfullsize_h_
 
-#include <Arduino.h>
-
-#define _usb_h_ // Workaround include trap in the USB Host library
-#include <avrpins.h>
+#include <stdint.h> // Needed for uint8_t, uint16_t etc.
 
 #define buzzer P13 // Buzzer used for audio feedback
 

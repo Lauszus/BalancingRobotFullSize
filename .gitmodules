@@ -1,0 +1,6 @@
+[submodule "Arduino_Makefile_master"]
+	path = Arduino_Makefile_master
+	url = https://github.com/Lauszus/Arduino_Makefile_master.git
+[submodule "KalmanFilter"]
+	path = KalmanFilter
+	url = https://github.com/TKJElectronics/KalmanFilter.git

@@ -15,6 +15,8 @@
  e-mail   :  kristianl@tkjelectronics.com
 */
 
+#include <Arduino.h>
+
 #include "PID.h"
 #include "BalancingRobotFullSize.h"
 #include "Motor.h"

@@ -16,7 +16,7 @@
 */
 
 #include "Motor.h"
-#include "BalancingRobotFullSize.h"
+#include "avrpins.h"
 #include "EEPROM.h"
 #include "PID.h"
 #include "IMU.h"

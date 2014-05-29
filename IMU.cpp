@@ -15,8 +15,11 @@
  e-mail   :  kristianl@tkjelectronics.com
 */
 
+#include <Arduino.h>
+
 #include "IMU.h"
 #include "BalancingRobotFullSize.h"
+#include "avrpins.h"
 #include "I2C.h"
 #include "EEPROM.h"
 #include "PID.h"
@@ -37,7 +40,7 @@ void updateIMUValues();
 
 void initIMU() {
   /* Setup IMU */
-  initI2C();
+  initI2c();
 
   while (i2cRead(IMUAddress, 0x75, i2cBuffer, 1));
   if (i2cBuffer[0] != 0x68) { // Read "WHO_AM_I" register
