@@ -89,4 +89,6 @@ void loop () {
   pidTimer = timer;
 
   parseSerialData();
+
+  delay(2); // TODO: Remove this delay and use INT to figure out if there is any new data from the interrupt
 }
