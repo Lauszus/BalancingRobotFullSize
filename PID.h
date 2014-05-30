@@ -20,6 +20,7 @@
 
 extern double lastError;
 extern double integratedError;
+extern double currentSpeed;
 
 void updatePID(double restAngle, double offset, double turning, double dt);
 

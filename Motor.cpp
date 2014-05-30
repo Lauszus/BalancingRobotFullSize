@@ -48,7 +48,7 @@ void initMotors() {
   // Clear OC1A/OC1B on compare match when up-counting
   // Set OC1A/OC1B on compare match when down-counting
   TCCR1A = (1 << COM1A1) | (1 << COM1B1);
-  
+
   stopMotor(left);
   stopMotor(right);
 }
@@ -87,4 +87,5 @@ void stopAndReset() {
   stopMotor(right);
   lastError = 0;
   integratedError = 0;
+  currentSpeed = 0;
 }

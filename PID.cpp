@@ -25,6 +25,8 @@
 double lastError; // Store last angle error
 double integratedError; // Store integrated error
 
+double currentSpeed; // Estimated speed from PWM value
+
 void updatePID(double restAngle, double offset, double turning, double dt) {
   /* Update PID values */
   double error = (restAngle - pitch);
@@ -48,14 +50,24 @@ void updatePID(double restAngle, double offset, double turning, double dt) {
       turning = 0;
   }
 #endif
-  
+
+  currentSpeed = (currentSpeed + PIDValue * 0.004) * 0.999;
+  currentSpeed = constrain(currentSpeed, -50, 50);
+
+  //Serial.print(PIDValue); Serial.write('\t'); Serial.print(currentSpeed); Serial.write('\t');
+
+  PIDValue += currentSpeed;
+
+  //Serial.println(PIDValue);
+
+  // TODO: Turn opposite when going backwards
   double PIDLeft = PIDValue + turning;
   double PIDRight = PIDValue - turning;
 
   PIDLeft *= cfg.leftMotorScaler; // Compensate for difference in some of the motors
   PIDRight *= cfg.rightMotorScaler;
-  
-  //Serial.print(PIDLeft); Serial.write('\t'); Serial.println(PIDRight); 
+
+  //Serial.print(PIDLeft); Serial.write('\t'); Serial.println(PIDRight);
 
   /* Set PWM Values */
   if (PIDLeft >= 0)
