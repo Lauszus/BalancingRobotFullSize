@@ -36,6 +36,9 @@ static uint32_t pidTimer; // Timer used for the PID loop
 static bool layingDown;
 
 void setup() {
+  /* Setup deadman button */
+  deadmanButton::SetDirRead();
+
   /* Setup buzzer pin */
   buzzer::SetDirWrite();
 
@@ -73,7 +76,7 @@ void loop () {
   uint32_t timer = micros();
   // If the robot is laying down, it has to be put in a vertical position before it starts balancing
   // If it's already balancing it has to be ±45 degrees before it stops trying to balance
-  if ((layingDown && (pitch < cfg.targetAngle - 5 || pitch > cfg.targetAngle + 5)) || (!layingDown && (pitch < cfg.targetAngle - 45 || pitch > cfg.targetAngle + 45))) {
+  if (!deadmanButton::IsSet() || (layingDown && (pitch < cfg.targetAngle - 5 || pitch > cfg.targetAngle + 5)) || (!layingDown && (pitch < cfg.targetAngle - 45 || pitch > cfg.targetAngle + 45))) {
     layingDown = true; // The robot is in a unsolvable position, so turn off both motors and wait until it's vertical again
     stopAndReset();
   } else {
