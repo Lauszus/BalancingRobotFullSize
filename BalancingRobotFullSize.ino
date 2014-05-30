@@ -81,10 +81,10 @@ void loop () {
     stopAndReset();
   } else {
     layingDown = false; // It's no longer laying down
-    double turning = analogRead(A1) / 204.6 - 2.5;
-    Serial.println(turning);
-    turning *= 30;
-    updatePID(cfg.targetAngle, turning, 0 /*turningOffset*/, (double)(timer - pidTimer) / 1000000.0);
+    double turning = analogRead(A0) / 204.6 - 2.5; // First convert reading to voltage and then subtract 2.5V, as this is the center of the steering wheel
+    turning *= 30; // Scale the turning value, so it will actually turn - TODO: Make this adjustable
+    //Serial.println(turning);
+    updatePID(cfg.targetAngle, 0 /*targetOffset*/, turning, (double)(timer - pidTimer) / 1000000.0);
   }
   pidTimer = timer;
 
