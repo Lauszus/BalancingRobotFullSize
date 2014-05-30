@@ -18,7 +18,7 @@
 #ifndef _protocol_h_
 #define _protocol_h_
 
-#define DEBUG 1
+#define DEBUG 0
 
 void initSerial();
 void parseSerialData();
