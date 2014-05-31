@@ -20,7 +20,7 @@
 
 #include "I2C.h"
 
-static const uint16_t I2C_TIMEOUT = 100; // Used to check for errors in I2C communication
+static const uint16_t I2C_TIMEOUT = 10; // Used to check for errors in I2C communication
 
 void initI2c() {
   Wire.begin();
