@@ -29,11 +29,10 @@
 
 double pitch; // Angle of the robot
 
-/* Used for timing */
 uint32_t kalmanTimer; // Timer used for the Kalman filter
 static uint32_t pidTimer; // Timer used for the PID loop
 
-static bool layingDown;
+static bool layingDown; // Used to indicate if the robot is laying down or the button is pressed
 
 void setup() {
   /* Setup deadman button */
@@ -89,5 +88,5 @@ void loop () {
     pidTimer = timer;
   }
 
-  parseSerialData();
+  parseSerialData(); // Parse incoming serial data
 }

@@ -21,7 +21,7 @@
 
 cfg_t cfg; //  Struct for all the configuration values
 
-static const char *firmwareVersion = "1.0.0";
+//static const char *firmwareVersion = "1.0.0";
 static const uint8_t eepromVersion = 1; // EEPROM version - used to restore the EEPROM values if the configuration struct have changed
 
 /* EEPROM Address Definitions */
@@ -58,13 +58,13 @@ void updateEEPROMValues() {
 }
 
 void restoreEEPROMValues() {
-  cfg.Kp = 3.0;
-  cfg.Ki = 0.0;
-  cfg.Kd = 0.0;
+  cfg.Kp = 2.6;
+  cfg.Ki = 0.1;
+  cfg.Kd = 1.5;
 
   cfg.targetAngle = 0.0;
-  cfg.controlAngleLimit = 7;
-  cfg.turningLimit = 25;
+  cfg.controlAngleLimit = 0;
+  cfg.turningLimit = 0;
 
   cfg.Qangle = 0.001;
   cfg.Qbias = 0.003;
