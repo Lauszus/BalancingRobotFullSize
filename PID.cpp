@@ -43,8 +43,7 @@ void updatePID(double restAngle, double offset, double turning, double dt) {
     turning += abs((double)wheelVelocity / velocityScaleTurning); // Scale down at high speed
     if (turning > 0)
       turning = 0;
-  }
-  else if (turning > 0) { // Right
+  } else if (turning > 0) { // Right
     turning -= abs((double)wheelVelocity / velocityScaleTurning); // Scale down at high speed
     if (turning < 0)
       turning = 0;

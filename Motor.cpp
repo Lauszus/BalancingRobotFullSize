@@ -59,8 +59,7 @@ void moveMotor(Command motor, Command direction, double speedRaw) { // Speed is 
       leftDir::Set();
     else
       leftDir::Clear();
-  }
-  else {
+  } else {
     if (direction == forward)
       rightDir::Clear();
     else
