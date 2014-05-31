@@ -17,7 +17,6 @@
 
 #include "Motor.h"
 #include "Pins.h"
-#include "PID.h"
 
 const uint16_t PWM_FREQUENCY = 20000; // The motor driver can handle a PWM frequency up to 20kHz
 const uint16_t PWMVALUE = F_CPU / PWM_FREQUENCY / 2; // The frequency is given by F_CPU/(2*N*ICR) - where N is the prescaler, prescaling is used so the frequency is given by F_CPU/(2*ICR) - ICR = F_CPU/PWM_FREQUENCY/2
@@ -78,12 +77,4 @@ void setPWM(Command motor, uint16_t dutyCycle) { // dutyCycle is a value between
     OCR1A = dutyCycle;
   else
     OCR1B = dutyCycle;
-}
-
-void stopAndReset() {
-  stopMotor(left);
-  stopMotor(right);
-  lastError = 0;
-  integratedError = 0;
-  currentSpeed = 0;
 }

@@ -28,6 +28,5 @@ enum Command {
 void initMotors();
 void moveMotor(Command motor, Command direction, double speedRaw);
 void stopMotor(Command motor);
-void stopAndReset();
 
 #endif

@@ -22,10 +22,10 @@
 #include "Motor.h"
 #include "EEPROM.h"
 
-double lastError; // Store last angle error
-double integratedError; // Store integrated error
+static double lastError; // Store last angle error
+static double integratedError; // Store integrated error
 
-double currentSpeed; // Estimated speed from PWM value
+static double currentSpeed; // Estimated speed from PWM value
 
 void updatePID(double restAngle, double offset, double turning, double dt) {
   /* Update PID values */
@@ -78,4 +78,12 @@ void updatePID(double restAngle, double offset, double turning, double dt) {
     moveMotor(right, forward, PIDRight);
   else
     moveMotor(right, backward, -PIDRight);
+}
+
+void stopAndReset() {
+  stopMotor(left);
+  stopMotor(right);
+  lastError = 0;
+  integratedError = 0;
+  currentSpeed = 0;
 }
