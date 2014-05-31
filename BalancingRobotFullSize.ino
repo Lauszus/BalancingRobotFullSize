@@ -69,26 +69,25 @@ void setup() {
 void loop () {
   // TODO: Check motor diagnostic pins
 
-  // TODO: if (newValues) {
-  updateAngle();
+  if (dataReady::IsSet()) { // Check is new data is ready
+    updateAngle();
 
-  /* Drive motors */
-  uint32_t timer = micros();
-  // If the robot is laying down, it has to be put in a vertical position before it starts balancing
-  // If it's already balancing it has to be ±45 degrees before it stops trying to balance
-  if (!deadmanButton::IsSet() || (layingDown && (pitch < cfg.targetAngle - 5 || pitch > cfg.targetAngle + 5)) || (!layingDown && (pitch < cfg.targetAngle - 45 || pitch > cfg.targetAngle + 45))) {
-    layingDown = true; // The robot is in a unsolvable position, so turn off both motors and wait until it's vertical again
-    stopAndReset();
-  } else {
-    layingDown = false; // It's no longer laying down
-    double turning = analogRead(A0) / 204.6 - 2.5; // First convert reading to voltage and then subtract 2.5V, as this is the center of the steering wheel
-    turning *= 30; // Scale the turning value, so it will actually turn - TODO: Make this adjustable
-    //Serial.println(turning);
-    updatePID(cfg.targetAngle, 0 /*targetOffset*/, turning, (double)(timer - pidTimer) / 1000000.0);
+    /* Drive motors */
+    uint32_t timer = micros();
+    // If the robot is laying down, it has to be put in a vertical position before it starts balancing
+    // If it's already balancing it has to be ±45 degrees before it stops trying to balance
+    if (!deadmanButton::IsSet() || (layingDown && (pitch < cfg.targetAngle - 5 || pitch > cfg.targetAngle + 5)) || (!layingDown && (pitch < cfg.targetAngle - 45 || pitch > cfg.targetAngle + 45))) {
+      layingDown = true; // The robot is in a unsolvable position, so turn off both motors and wait until it's vertical again
+      stopAndReset();
+    } else {
+      layingDown = false; // It's no longer laying down
+      double turning = analogRead(A0) / 204.6 - 2.5; // First convert reading to voltage and then subtract 2.5V, as this is the center of the steering wheel
+      turning *= 30; // Scale the turning value, so it will actually turn - TODO: Make this adjustable
+      //Serial.println(turning);
+      updatePID(cfg.targetAngle, 0 /*targetOffset*/, turning, (double)(timer - pidTimer) / 1000000.0);
+    }
+    pidTimer = timer;
   }
-  pidTimer = timer;
 
   parseSerialData();
-
-  delay(2); // TODO: Remove this delay and use INT to figure out if there is any new data from the interrupt
 }

@@ -20,6 +20,8 @@
 
 #include <Kalman.h>
 
+#define dataReady P2
+
 extern Kalman kalman;
 
 void initIMU();
