@@ -19,10 +19,9 @@
 
 #include "IMU.h"
 #include "BalancingRobotFullSize.h"
-#include "avrpins.h"
+#include "Pins.h"
 #include "I2C.h"
 #include "EEPROM.h"
-#include "PID.h"
 
 Kalman kalman;
 

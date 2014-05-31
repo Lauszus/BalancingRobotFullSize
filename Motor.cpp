@@ -16,10 +16,8 @@
 */
 
 #include "Motor.h"
-#include "avrpins.h"
-#include "EEPROM.h"
+#include "Pins.h"
 #include "PID.h"
-#include "IMU.h"
 
 const uint16_t PWM_FREQUENCY = 20000; // The motor driver can handle a PWM frequency up to 20kHz
 const uint16_t PWMVALUE = F_CPU / PWM_FREQUENCY / 2; // The frequency is given by F_CPU/(2*N*ICR) - where N is the prescaler, prescaling is used so the frequency is given by F_CPU/(2*ICR) - ICR = F_CPU/PWM_FREQUENCY/2

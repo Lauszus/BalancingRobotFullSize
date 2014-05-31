@@ -20,7 +20,7 @@
 #include <Kalman.h>
 
 #include "BalancingRobotFullSize.h"
-#include "avrpins.h"
+#include "Pins.h"
 #include "Motor.h"
 #include "IMU.h"
 #include "EEPROM.h"

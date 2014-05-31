@@ -20,9 +20,6 @@
 
 #include <stdint.h> // Needed for uint8_t, uint16_t etc.
 
-#define buzzer P13 // Buzzer used for audio feedback
-#define deadmanButton P15 // (A1) Deadman button
-
 extern double pitch;
 extern uint32_t kalmanTimer;
 
