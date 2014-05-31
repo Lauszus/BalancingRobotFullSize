@@ -49,12 +49,12 @@ void initIMU() {
     while (1); // Halt
   }
 
-  while (i2cWrite(IMUAddress, 0x6B, (1 << 7), true)); // Reset device, this resets all internal registers to their default values
+  while (i2cWrite(IMUAddress, 0x6B, (1 << 7))); // Reset device, this resets all internal registers to their default values
   do {
     while (i2cRead(IMUAddress, 0x6B, i2cBuffer, 1));
   } while (i2cBuffer[0] & (1 << 7)); // Wait for the bit to clear
   delay(5);
-  while (i2cWrite(IMUAddress, 0x6B, (1 << 3) | (1 << 0), true)); // Disable sleep mode, disable temperature sensor and use PLL with X axis gyroscope as clock reference
+  while (i2cWrite(IMUAddress, 0x6B, (1 << 3) | (1 << 0))); // Disable sleep mode, disable temperature sensor and use PLL with X axis gyroscope as clock reference
 
 #if 1
   i2cBuffer[0] = 1; // Set the sample rate to 500Hz - 1kHz/(1+1) = 500Hz
@@ -65,14 +65,14 @@ void initIMU() {
 #endif
   i2cBuffer[2] = 0x00; // Set Gyro Full Scale Range to ±250deg/s
   i2cBuffer[3] = 0x00; // Set Accelerometer Full Scale Range to ±2g
-  while (i2cWrite(IMUAddress, 0x19, i2cBuffer, 4, true)); // Write to all four registers at once
+  while (i2cWrite(IMUAddress, 0x19, i2cBuffer, 4)); // Write to all four registers at once
 
   /* Enable Data Ready Interrupt on INT pin */
   i2cBuffer[0] = (1 << 5) | (1 << 4); // Enable LATCH_INT_EN and INT_RD_CLEAR
                                       // When this bit is equal to 1, the INT pin is held high until the interrupt is cleared
                                       // When this bit is equal to 1, interrupt status bits are cleared on any read operation
   i2cBuffer[1] = (1 << 0); // Enable DATA_RDY_EN - When set to 1, this bit enables the Data Ready interrupt, which occurs each time a write operation to all of the sensor registers has been completed
-  while (i2cWrite(IMUAddress, 0x37, i2cBuffer, 2, true)); // Write to both registers at once
+  while (i2cWrite(IMUAddress, 0x37, i2cBuffer, 2)); // Write to both registers at once
 
   dataReady::SetDirRead();
 

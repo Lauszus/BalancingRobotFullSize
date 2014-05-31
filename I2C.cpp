@@ -27,11 +27,11 @@ void initI2c() {
   TWBR = ((F_CPU / 400000L) - 16) / 2; // Set I2C frequency to 400kHz
 }
 
-uint8_t i2cWrite(uint8_t address, uint8_t registerAddress, uint8_t data, bool sendStop) {
+uint8_t i2cWrite(uint8_t address, uint8_t registerAddress, uint8_t data, bool sendStop /*= true*/) {
   return i2cWrite(address, registerAddress, &data, 1, sendStop); // Returns 0 on success
 }
 
-uint8_t i2cWrite(uint8_t address, uint8_t registerAddress, uint8_t *data, uint8_t length, bool sendStop) {
+uint8_t i2cWrite(uint8_t address, uint8_t registerAddress, uint8_t *data, uint8_t length, bool sendStop /*= true*/) {
   Wire.beginTransmission(address);
   Wire.write(registerAddress);
   Wire.write(data, length);
