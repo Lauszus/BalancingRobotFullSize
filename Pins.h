@@ -32,12 +32,14 @@
 #define deadmanButton P15 // (A1) Deadman button
 
 /* Left motor */
-#define leftDir P8
-#define leftPWM P9
+#define leftDir P12
+#define leftPWM P10
+#define leftPWMReg OCR1B
 
 /* Right motor */
-#define rightDir P12
-#define rightPWM P10
+#define rightDir P8
+#define rightPWM P9
+#define rightPWMReg OCR1A
 
 /* Pins connected to the motor drivers diagnostic pins */
 /*#define leftF1 P5

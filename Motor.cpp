@@ -56,14 +56,14 @@ void moveMotor(Command motor, Command direction, double speedRaw) { // Speed is 
   setPWM(motor, speedRaw * ((double)PWMVALUE) / 100.0); // Scale from 0-100 to 0-PWMVALUE
   if (motor == left) {
     if (direction == forward)
-      leftDir::Set();
-    else
       leftDir::Clear();
+    else
+      leftDir::Set();
   } else {
     if (direction == forward)
-      rightDir::Clear();
-    else
       rightDir::Set();
+    else
+      rightDir::Clear();
   }
 }
 
@@ -73,7 +73,7 @@ void stopMotor(Command motor) {
 
 void setPWM(Command motor, uint16_t dutyCycle) { // dutyCycle is a value between 0-ICR1
   if (motor == left)
-    OCR1A = dutyCycle;
+    leftPWMReg = dutyCycle;
   else
-    OCR1B = dutyCycle;
+    rightPWMReg = dutyCycle;
 }

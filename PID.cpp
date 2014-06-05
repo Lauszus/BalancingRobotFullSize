@@ -50,7 +50,7 @@ void updatePID(double restAngle, double offset, double turning, double dt) {
   }
 #endif
 
-  currentSpeed = (currentSpeed + PIDValue * 0.004) * 0.999;
+  currentSpeed = (currentSpeed + PIDValue * 0.004) * 0.999; // TODO: Explain this
   currentSpeed = constrain(currentSpeed, -50, 50);
 
   //Serial.print(PIDValue); Serial.write('\t'); Serial.print(currentSpeed); Serial.write('\t');
