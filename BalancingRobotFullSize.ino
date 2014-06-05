@@ -16,7 +16,7 @@
 */
 
 #include <Arduino.h>
-#include <Wire.h>
+#include <Wire.h> // Standard Arduino I2C library
 #include <Kalman.h>
 
 #include "BalancingRobotFullSize.h"
@@ -33,6 +33,15 @@ uint32_t kalmanTimer; // Timer used for the Kalman filter
 static uint32_t pidTimer; // Timer used for the PID loop
 
 static bool layingDown; // Used to indicate if the robot is laying down or the button is pressed
+
+static double zeroTurning;
+
+double getTurning() {
+  double turning = (((double)analogRead(A0)) / 204.6) - 2.5; // First convert reading to voltage and then subtract 2.5V, as this is the center of the steering wheel
+  turning *= 30; // Scale the turning value, so it will actually turn - TODO: Make this adjustable*/
+  //Serial.println(turning);
+  return turning;
+}
 
 void setup() {
   /* Setup deadman button */
@@ -55,6 +64,8 @@ void setup() {
   initMotors();
   initIMU();
 
+  zeroTurning = getTurning(); // Calibrate turning
+
   /* Beep to indicate that it is now ready */
   buzzer::Set();
   delay(100);
@@ -75,14 +86,13 @@ void loop () {
     uint32_t timer = micros();
     // If the robot is laying down, it has to be put in a vertical position before it starts balancing
     // If it's already balancing it has to be ±45 degrees before it stops trying to balance
+    // Also make sure that the deadman buttons is pressed
     if (!deadmanButton::IsSet() || (layingDown && (pitch < cfg.targetAngle - 5 || pitch > cfg.targetAngle + 5)) || (!layingDown && (pitch < cfg.targetAngle - 45 || pitch > cfg.targetAngle + 45))) {
       layingDown = true; // The robot is in a unsolvable position, so turn off both motors and wait until it's vertical again
       stopAndReset();
     } else {
       layingDown = false; // It's no longer laying down
-      double turning = analogRead(A0) / 204.6 - 2.5; // First convert reading to voltage and then subtract 2.5V, as this is the center of the steering wheel
-      turning *= 30; // Scale the turning value, so it will actually turn - TODO: Make this adjustable
-      //Serial.println(turning);
+      double turning = getTurning() - zeroTurning;
       updatePID(cfg.targetAngle, 0 /*targetOffset*/, turning, (double)(timer - pidTimer) / 1000000.0);
     }
     pidTimer = timer;
