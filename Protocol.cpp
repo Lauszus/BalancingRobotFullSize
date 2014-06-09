@@ -46,6 +46,7 @@ void initSerial() {
   Serial.setTimeout(10); // Only wait 10ms for serial data
 }
 
+// TODO: Remove all debugging
 void parseSerialData() {
   if (Serial.available()) {
     if (Serial.find((char*)commandHeader)) {
@@ -113,6 +114,7 @@ void parseSerialData() {
 // n length of data: uint8_t
 // Data: n uint8_t
 // Checksum (calculated from cmd, length and data)
+// Carriage return and line feed ("\r\n")
 
 // All floats/doubles are multiplied by 100 before sending
 
@@ -127,10 +129,9 @@ bool getData(uint8_t *data, uint8_t length) {
 
 void sendData(uint8_t *data, uint8_t length) {
   Serial.write(responseHeader);
-  Serial.write(msg.cmd);
-  Serial.write(msg.length);
+  Serial.write((uint8_t*)&msg, sizeof(msg));
   Serial.write(data, length);
-  Serial.write(getCheckSum((uint8_t*)&msg, sizeof(msg)) ^ getCheckSum(data, length));
+  Serial.write(getCheckSum((uint8_t*)&msg, sizeof(msg)) ^ getCheckSum(data, length)); // The checksum is calculated from the length, command and the data
   Serial.println(); // Print new line as well
 }
 
