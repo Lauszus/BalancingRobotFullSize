@@ -265,13 +265,13 @@ void getPIDValues() {
   byte output[] = {
     GET_PID, // Cmd
     0, // Length
-  };    
+  };
   sendCommand(output); // Send output
 }
 
 void submit() {
   //println("PID values: " + P.getText() + " " + I.getText() + " " + D.getText());// +  " TargetAnlge: " + targetAngle.getText());
-    
+
   setPIDValues();
   delay(10);
   getPIDValues();
@@ -367,18 +367,18 @@ void serialEvent(Serial serial) {
     for (i = 0; i < length; i++)
       input[i] = data[i + responseHeader.length() + 2];
     int checksum = data[i + responseHeader.length() + 2];
-    
+
     if (checksum == (cmd ^ length ^ getChecksum(input))) {
       switch(cmd) {
         case GET_PID:
           int Kp = input[0] | (input[1] << 8);
           int Ki = input[2] | (input[3] << 8);
           int Kd = input[4] | (input[5] << 8);
-          
+
           P.setText(Float.toString((float)Kp / 100.0));
           I.setText(Float.toString((float)Ki / 100.0));
           D.setText(Float.toString((float)Kd / 100.0));
-          
+
           println(Kp + " " + Ki + " " + Kd);
           break;
         default:
@@ -392,7 +392,7 @@ void serialEvent(Serial serial) {
 
 /*
   if (input[0].equals("P") && input.length == 5) { // PID values
-    
+
     targetAngle.setText(input[4]);
   } else if (input[0].equals("K") && input.length == 4) { // Kalman values
     Qangle.setText(input[1]);
@@ -539,4 +539,4 @@ void SaveSerialPort(String port) {
     output.print(port); // Write the comport to the file
     output.flush(); // Writes the remaining data to the file
     output.close(); // Finishes the file
- }
+}
