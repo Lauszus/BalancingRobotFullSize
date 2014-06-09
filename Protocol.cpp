@@ -21,37 +21,24 @@
 #include "EEPROM.h"
 
 struct msg_t {
-  uint8_t length;
   uint8_t cmd;
+  uint8_t length;
 } msg;
-/*
+
 struct pid_t {
-  double Kp;
-  double Ki;
-  double Kd;
+  uint16_t Kp;
+  uint16_t Ki;
+  uint16_t Kd;
 } pid;
-*/
-#define SET_PID 0 // Out message: Kp, Ki, Kd
+
+#define SET_PID 0 // In message: Kp, Ki, Kd
 #define GET_PID 1 // Out message: Kp, Ki, Kd
 
-const char *responseHeader = "$S>"; // Standard response header
-//const char *commandHeader = "$S<"; // Standard command header
-
-// Message protocol (Inspired by MultiWii):
-// Header: $S>
-// Length of data: uint8_t
-// cmd: uint8_t
-// Data: n uint8_t
-// Checksum
-
-// Response:
-// Header: $S<
-// Length of data: uint8_t
-// cmd: uint8_t
-// Data: n uint8_t
-// Checksum
+const char *commandHeader = "$S>"; // Standard command header
+const char *responseHeader = "$S<"; // Standard response header
 
 bool getData(uint8_t *data, uint8_t length);
+void sendData(uint8_t *data, uint8_t length);
 uint8_t getCheckSum(uint8_t *data, size_t length);
 
 void initSerial() {
@@ -61,60 +48,31 @@ void initSerial() {
 
 void parseSerialData() {
   if (Serial.available()) {
-    if (Serial.find((char*)responseHeader)) {
-      if (Serial.readBytes((char*)&msg, sizeof(msg)) == sizeof(msg)) {
-#if 1
-        switch (msg.cmd - '0') {
+    if (Serial.find((char*)commandHeader)) {
+      if (Serial.readBytes((uint8_t*)&msg, sizeof(msg)) == sizeof(msg)) {
+        switch (msg.cmd) {
           case GET_PID:
-            Serial.print(cfg.Kp);
-            Serial.print('\t');
-            Serial.print(cfg.Ki);
-            Serial.print('\t');
-            Serial.println(cfg.Kd);
+            if (msg.length == 0) {
+              if (getData(NULL, 0)) { // This will read the data and check the checksum
+                msg.cmd = GET_PID;
+                msg.length = sizeof(pid);
+                pid.Kp = cfg.Kp * 100;
+                pid.Ki = cfg.Ki * 100;
+                pid.Kd = cfg.Kd * 100;
+                sendData((uint8_t*)&pid, sizeof(pid));
+              }
+#if DEBUG
+              else
+                Serial.println(F("GET_PID checksum error"));
+#endif
+            }
             break;
           case SET_PID:
-            if (msg.length - '0' == 3 /*sizeof(pid)/sizeof(pid.Kp)*/) {
-              char input[30];
-
-              size_t pos = Serial.readBytesUntil(';', input, sizeof(input));
-              if (pos >= sizeof(input)) {
-#if DEBUG
-                //Serial.print(pos); Serial.print('\t'); Serial.println(sizeof(input));
-                Serial.println(F("Incoming string is too long!"));
-#endif
-                return;
-              }
-              input[pos] = '\0'; // Insert null character
-
-              double Kp = atof(strtok(input, ","));
-              double Ki = atof(strtok(NULL, ","));
-              double Kd = atof(strtok(NULL, ","));
-              int checksum = atoi(strtok(NULL, ";"));
-
-              int check = (int)(Kp * 100) ^ (int)(Ki * 100) ^ (int)(Kd * 100);
-#if 0
-              Serial.print(Kp);
-              Serial.print('\t');
-              Serial.print(Ki);
-              Serial.print('\t');
-              Serial.println(Kd);
-
-              Serial.print(F("Checksum: "));
-              Serial.print(checksum);
-              Serial.print(F(" VS "));
-              Serial.println(check);
-#endif
-              if (check == checksum) {
-                cfg.Kp = Kp;
-                cfg.Ki = Ki;
-                cfg.Kd = Kd;
-#if DEBUG
-                Serial.print(cfg.Kp);
-                Serial.print('\t');
-                Serial.print(cfg.Ki);
-                Serial.print('\t');
-                Serial.println(cfg.Kd);
-#endif
+            if (msg.length == sizeof(pid)) { // Make sure that it has the right length
+              if (getData((uint8_t*)&pid, sizeof(pid))) { // This will read the data and check the checksum
+                cfg.Kp = (double)pid.Kp / 100.0;
+                cfg.Ki = (double)pid.Ki / 100.0;
+                cfg.Kd = (double)pid.Kd / 100.0;
                 updateEEPROMValues();
               }
 #if DEBUG
@@ -127,25 +85,6 @@ void parseSerialData() {
               Serial.print(F("SET_PID length error: "));
               Serial.println(msg.length);
             }
-#endif
-#else
-        switch (msg.cmd) {
-          case SET_PID:
-            if (msg.length == sizeof(pid) && getData((uint8_t*)&pid, sizeof(pid))) {
-              Serial.print(pid.Kp);
-              Serial.print('\t');
-              Serial.print(pid.Ki);
-              Serial.print('\t');
-              Serial.println(pid.Kd);
-              cfg.Kp = pid.Kp;
-              cfg.Ki = pid.Ki;
-              cfg.Kd = pid.Kd;
-              updateEEPROMValues();
-            }
-#if DEBUG
-            else
-              Serial.println(F("SET_PID checksum error"));
-#endif
 #endif
             break;
 #if DEBUG
@@ -160,13 +99,39 @@ void parseSerialData() {
   }
 }
 
+// Message protocol (Inspired by MultiWii):
+// Request:
+// Header: $S>
+// cmd: uint8_t
+// n length of data: uint8_t
+// Data: n uint8_t
+// Checksum (calculated from cmd, length and data)
+
+// Response:
+// Header: $S<
+// cmd: uint8_t
+// n length of data: uint8_t
+// Data: n uint8_t
+// Checksum (calculated from cmd, length and data)
+
+// All floats/doubles are multiplied by 100 before sending
+
 bool getData(uint8_t *data, uint8_t length) {
-  if (!(Serial.readBytes((char*)data, length) == length))
+  if (Serial.readBytes(data, length) != length) // Read data into buffer
     return false;
-  char checksum;
-  if (Serial.readBytes(&checksum, sizeof(checksum)) != sizeof(checksum))
+  uint8_t checksum;
+  if (Serial.readBytes(&checksum, sizeof(checksum)) != sizeof(checksum)) // Read the checksum
     return false;
   return (getCheckSum((uint8_t*)&msg, sizeof(msg)) ^ getCheckSum(data, length)) == checksum; // The checksum is calculated from the length, command and the data
+}
+
+void sendData(uint8_t *data, uint8_t length) {
+  Serial.write(responseHeader);
+  Serial.write(msg.cmd);
+  Serial.write(msg.length);
+  Serial.write(data, length);
+  Serial.write(getCheckSum((uint8_t*)&msg, sizeof(msg)) ^ getCheckSum(data, length));
+  Serial.println(); // Print new line as well
 }
 
 uint8_t getCheckSum(uint8_t *data, size_t length) {
