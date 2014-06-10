@@ -38,7 +38,7 @@ static double zeroTurning;
 
 double getTurning() {
   double turning = (double)analogRead(A0) / 204.6 - 2.5; // First convert reading to voltage and then subtract 2.5V, as this is the center of the steering wheel
-  turning *= 40; // Scale the turning value, so it will actually turn - TODO: Make this adjustable
+  turning *= cfg.turningScale; // Scale the turning value, so it will actually turn
   //Serial.println(turning);
   return turning;
 }

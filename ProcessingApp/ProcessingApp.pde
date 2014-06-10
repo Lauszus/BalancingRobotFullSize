@@ -23,7 +23,7 @@ import java.awt.Image;
 ControlP5 controlP5;
 
 PFont font10, font25, font30;
-Textfield P, I, D, targetAngle, maxAngle, maxTurn, Qangle, Qbias, Rmeasure;
+Textfield P, I, D, targetAngle, maxAngle, turnScale, Qangle, Qbias, Rmeasure;
 CheckBox checkBox;
 
 String firmwareVer = "", eepromVer = "", mcu = "", voltage = "", minutes = "", seconds = "";
@@ -50,15 +50,7 @@ boolean drawValues; // This is set to true whenever there is any new data
 final int mainWidth = 337; // Width of the main control panel
 final int graphWidth = 700; // Width of the graph
 
-
-
-final byte SET_PID = 0; // In message: Kp, Ki, Kd
-final byte GET_PID = 1; // Out message: Kp, Ki, Kd
-
 String portnameFile = "SerialPort.txt"; // Name of file for last connected serial port
-
-String commandHeader = "$S>"; // Standard command header
-String responseHeader = "$S<"; // Standard response header
 
 void setup() {
   registerMethod("dispose", this); // Called automatically before shutting down
@@ -99,7 +91,7 @@ void setup() {
   targetAngle = controlP5.addTextfield("targetAngle")
                          .setPosition(130, 165)
                          .setSize(35, 20)
-                         .setInputFilter(ControlP5.FLOAT)
+                         //.setInputFilter(ControlP5.FLOAT) // This can be negative as well
                          .setAutoClear(false)
                          .clear();
 
@@ -111,7 +103,7 @@ void setup() {
                .setAutoClear(false)
                .clear();
 
-  maxTurn = controlP5.addTextfield("maxTurn")
+  turnScale = controlP5.addTextfield("turnScale")
                .setPosition(55, 255)
                .setSize(35, 20)
                .setInputFilter(ControlP5.INTEGER)
@@ -232,101 +224,9 @@ void continueAbort() {
     println("Establish a serial connection first!");
 }
 
-void sendCommand(byte output[]) {
-  if (connectedSerial) {
-      serial.write(commandHeader);
-      serial.write(output);
-      serial.write(getChecksum(output));
-  } else
-    println("Establish a serial connection first!");
-}
-
-void setPIDValues() {
-  if (!P.getText().isEmpty() && !I.getText().isEmpty() && !D.getText().isEmpty()) {
-    int KpValue = (int)(Float.parseFloat(P.getText()) * 100); // All floats/doubles are multuplied by 100 before sending
-    int KiValue = (int)(Float.parseFloat(I.getText()) * 100);
-    int KdValue = (int)(Float.parseFloat(D.getText()) * 100);
-
-    byte output[] = {
-      SET_PID, // Cmd
-      6, // Length
-      (byte)(KpValue & 0xFF),
-      (byte)(KpValue >> 8),
-      (byte)(KiValue & 0xFF),
-      (byte)(KiValue >> 8),
-      (byte)(KdValue & 0xFF),
-      (byte)(KdValue >> 8),
-    };
-    sendCommand(output); // Set PID values
-  }
-}
-
-void getPIDValues() {
-  byte output[] = {
-    GET_PID, // Cmd
-    0, // Length
-  };
-  sendCommand(output); // Send output
-}
-
 void submit() {
-  //println("PID values: " + P.getText() + " " + I.getText() + " " + D.getText());// +  " TargetAnlge: " + targetAngle.getText());
-
-  setPIDValues();
-  delay(10);
-  getPIDValues();
-
-/*
-    if (!P.getText().isEmpty()) {
-      println("Send P value");
-      serial.write("SP," + P.getText() + ';');
-      delay(10);
-    }
-    if (!I.getText().isEmpty()) {
-      println("Send I value");
-      serial.write("SI," + I.getText() + ';');
-      delay(10);
-    }
-    if (!D.getText().isEmpty()) {
-      println("Send D value");
-      serial.write("SD," + D.getText() + ';');
-      delay(10);
-    }
-    if (!targetAngle.getText().isEmpty()) {
-      println("Send target angle");
-      serial.write("ST," + targetAngle.getText() + ';');
-      delay(10);
-    }
-
-    println("Kalman values: " + Qangle.getText() + " " + Qbias.getText() + " " + Rmeasure.getValue());
-    if (!Qangle.getText().isEmpty() && !Qbias.getText().isEmpty() && !Rmeasure.getText().isEmpty()) {
-      println("Send Kalman values");
-      serial.write("SK," + Qangle.getText() + ',' + Qbias.getText() + ',' + Rmeasure.getText() + ';');
-      delay(10);
-    }
-
-    println("Settings: " + maxAngle.getText() + " " + maxTurn.getText() + " " + checkBox.getArrayValue(0));
-    if (!maxAngle.getText().isEmpty()) {
-      println("Send max angle");
-      serial.write("SA," + maxAngle.getText() + ';');
-      delay(10);
-    }
-    if (!maxTurn.getText().isEmpty()) {
-      println("Send turning angle");
-      serial.write("SU," + maxTurn.getText() + ';');
-      delay(10);
-    }
-    println("Send Back to spot");
-    serial.write("SB," + (checkBox.getArrayValue(0) == 1 ? '1' : '0') + ';');
-    delay(10);
-
-    serial.write("GP;"); // Get PID values
-    delay(50);
-    serial.write("GK;"); // Get Kalman values
-    delay(50);
-    serial.write("GS;"); // Get settings values
-    delay(10);
-*/
+  setAllValues();  // Set all values
+  getAllValues(); // Get all values back again
 }
 
 void restoreDefaults() {
@@ -338,22 +238,14 @@ void restoreDefaults() {
     println("Establish a serial connection first!");
 }
 
-byte getChecksum(byte data[]) {
-  byte checksum = 0;
-  for (int i = 0; i < data.length; i++)
-    checksum ^= data[i];
-  return checksum;
-}
-
-int getChecksum(int data[]) {
-  int checksum = 0;
-  for (int i = 0; i < data.length; i++)
-    checksum ^= data[i];
-  return checksum;
-}
+byte[] bytes;
+boolean append;
 
 void serialEvent(Serial serial) {
-  byte[] bytes = serial.readBytes();
+  if (append)
+    bytes = concat(bytes, serial.readBytes());
+  else
+    bytes = serial.readBytes();
   int[] data = new int[bytes.length];
   for (int i = 0; i < data.length; i++)
     data[i] = bytes[i] & 0xFF; // Cast to unsigned value
@@ -362,6 +254,10 @@ void serialEvent(Serial serial) {
   if (new String(bytes).startsWith(responseHeader)) {
     int cmd = data[responseHeader.length()];
     int length = data[responseHeader.length() + 1];
+    if (length != (data.length -  responseHeader.length() - 5)) {
+      append = true; // If it's not the correct length, then the rest will come in the next package
+      return;
+    }
     int input[] = new int[length];
     int i;
     for (i = 0; i < length; i++)
@@ -381,28 +277,43 @@ void serialEvent(Serial serial) {
 
           println(Kp + " " + Ki + " " + Kd);
           break;
+        case GET_TARGET:
+          int target = input[0] | ((byte)input[1] << 8); // This can be negative as well
+
+          targetAngle.setText(Float.toString((float)target / 100.0));
+
+          println(target);
+          break;
+        case GET_TURNING:
+          turnScale.setText(Integer.toString(input[0]));
+
+          println(input[0]);
+          break;
+        case GET_KALMAN:
+          int QangleValue = input[0] | (input[1] << 8);
+          int QbiasValue = input[2] | (input[3] << 8);
+          int RmeasureValue = input[4] | (input[5] << 8);
+
+          Qangle.setText(Float.toString((float)QangleValue / 10000.0));
+          Qbias.setText(Float.toString((float)QbiasValue / 10000.0));
+          Rmeasure.setText(Float.toString((float)RmeasureValue / 10000.0));
+
+          println(QangleValue + " " + QbiasValue + " " + RmeasureValue);
+          break;
         default:
           println("Unknown command");
           break;
       }
     } else
       println("Checksum error!");
-  } else
+  } else {
     println("Wrong header!");
+    println(new String(bytes));
+  }
+    
 
 /*
-  if (input[0].equals("P") && input.length == 5) { // PID values
-
-    targetAngle.setText(input[4]);
-  } else if (input[0].equals("K") && input.length == 4) { // Kalman values
-    Qangle.setText(input[1]);
-    Qbias.setText(input[2]);
-    Rmeasure.setText(input[3]);
-  } else if (input[0].equals("S") && input.length == 4) { // Settings
-    checkBox.getItem(0).setValue(input[1].equals("1") ? 1 : 0);
-    maxAngle.setText(input[2]);
-    maxTurn.setText(input[3]);
-  } else if (input[0].equals("I") && input.length == 4) { // Info
+  else if (input[0].equals("I") && input.length == 4) { // Info
     firmwareVer = input[1];
     eepromVer = input[2];
     mcu  = input[3];
@@ -415,11 +326,11 @@ void serialEvent(Serial serial) {
     stringAcc = input[1];
     stringGyro = input[2];
     stringKalman = input[3];
-  } else if (input[0].equals("PC"))
-    println("Now enable discovery of your device");
+  }
 */
   serial.clear();  // Empty the buffer
   drawValues = true; // Draw the graph
+  append = false;
 }
 
 void keyPressed() {
@@ -439,9 +350,9 @@ void keyPressed() {
     }
     else if (maxAngle.isFocus()) {
       maxAngle.setFocus(false);
-      maxTurn.setFocus(true);
-    } else if (maxTurn.isFocus()) {
-      maxTurn.setFocus(false);
+      turnScale.setFocus(true);
+    } else if (turnScale.isFocus()) {
+      turnScale.setFocus(false);
       maxAngle.setFocus(true);
     }
     else if (Qangle.isFocus()) {
@@ -492,19 +403,12 @@ void connect() {
       serial.bufferUntil('\n');
       connectedSerial = true;
       delay(3000); // Wait bit - needed for the standard serial connection, as it resets the board
-      getPIDValues();
-      /*serial.write("GP;"); // Get PID values
-      delay(50);
-      serial.write("GK;"); // Get Kalman values
-      delay(50);
-      serial.write("GS;"); // Get settings values
-      delay(50);
-      serial.write("GI;"); // Get info
-      delay(50);
+      getAllValues();
+      /*delay(50);
       serial.write("IB;"); // Start sending IMU values
       delay(50);
-      serial.write("RB;"); // Start sending status report
-      */
+      serial.write("RB;"); // Start sending status report*/
+
     }
   } else if (portNumber == -1)
     println("Select COM Port first!");

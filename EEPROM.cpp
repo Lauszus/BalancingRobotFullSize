@@ -22,7 +22,7 @@
 cfg_t cfg; //  Struct for all the configuration values
 
 //static const char *firmwareVersion = "1.0.0";
-static const uint8_t eepromVersion = 1; // EEPROM version - used to restore the EEPROM values if the configuration struct have changed
+static const uint8_t eepromVersion = 2; // EEPROM version - used to restore the EEPROM values if the configuration struct have changed
 
 /* EEPROM Address Definitions */
 static const uint8_t versionAddr = 0; // Set the first byte to the EEPROM version
@@ -44,27 +44,27 @@ bool checkEEPROMVersion() {
 void readEEPROMValues() {
   EEPROM_readAnything(configAddr, cfg);
 
-  kalman.setQangle(cfg.Qangle);
-  kalman.setQbias(cfg.Qbias);
-  kalman.setRmeasure(cfg.Rmeasure);
+  kalmanPitch.setQangle(cfg.Qangle);
+  kalmanPitch.setQbias(cfg.Qbias);
+  kalmanPitch.setRmeasure(cfg.Rmeasure);
 }
 
 void updateEEPROMValues() {
   EEPROM_updateAnything(configAddr, cfg);
 
-  kalman.setQangle(cfg.Qangle);
-  kalman.setQbias(cfg.Qbias);
-  kalman.setRmeasure(cfg.Rmeasure);
+  kalmanPitch.setQangle(cfg.Qangle);
+  kalmanPitch.setQbias(cfg.Qbias);
+  kalmanPitch.setRmeasure(cfg.Rmeasure);
 }
 
 void restoreEEPROMValues() {
-  cfg.Kp = 2.6;
-  cfg.Ki = 0.1;
-  cfg.Kd = 1.5;
+  cfg.Kp = 2.8;
+  cfg.Ki = 2.0;
+  cfg.Kd = 3.5;
 
   cfg.targetAngle = 0.0;
-  cfg.controlAngleLimit = 0;
-  cfg.turningLimit = 0;
+  //cfg.controlAngleLimit = 0;
+  cfg.turningScale = 40.0;
 
   cfg.Qangle = 0.001;
   cfg.Qbias = 0.003;

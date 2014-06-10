@@ -20,7 +20,7 @@
 
 #include <Kalman.h>
 
-extern Kalman kalman;
+extern Kalman kalmanPitch;
 
 void initIMU();
 void updateAngle();

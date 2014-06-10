@@ -23,16 +23,36 @@
 struct msg_t {
   uint8_t cmd;
   uint8_t length;
-} msg;
+} __attribute__((packed)) msg;
 
 struct pid_t {
   uint16_t Kp;
   uint16_t Ki;
   uint16_t Kd;
-} pid;
+} __attribute__((packed)) pid;
 
-#define SET_PID 0 // In message: Kp, Ki, Kd
-#define GET_PID 1 // Out message: Kp, Ki, Kd
+struct target_t {
+  int16_t targetAngle; // Note that this can be negative as well
+} __attribute__((packed)) target;
+
+struct turning_t {
+  uint8_t turningScale;
+} __attribute__((packed)) turning;
+
+struct kalman_t {
+  uint16_t Qangle;
+  uint16_t Qbias;
+  uint16_t Rmeasure;
+} __attribute__((packed)) kalman;
+
+#define SET_PID     0
+#define GET_PID     1
+#define SET_TARGET  2
+#define GET_TARGET  3
+#define SET_TURNING 4
+#define GET_TURNING 5
+#define SET_KALMAN  6
+#define GET_KALMAN  7
 
 const char *commandHeader = "$S>"; // Standard command header
 const char *responseHeader = "$S<"; // Standard response header
@@ -52,22 +72,6 @@ void parseSerialData() {
     if (Serial.find((char*)commandHeader)) {
       if (Serial.readBytes((uint8_t*)&msg, sizeof(msg)) == sizeof(msg)) {
         switch (msg.cmd) {
-          case GET_PID:
-            if (msg.length == 0) {
-              if (getData(NULL, 0)) { // This will read the data and check the checksum
-                msg.cmd = GET_PID;
-                msg.length = sizeof(pid);
-                pid.Kp = cfg.Kp * 100;
-                pid.Ki = cfg.Ki * 100;
-                pid.Kd = cfg.Kd * 100;
-                sendData((uint8_t*)&pid, sizeof(pid));
-              }
-#if DEBUG
-              else
-                Serial.println(F("GET_PID checksum error"));
-#endif
-            }
-            break;
           case SET_PID:
             if (msg.length == sizeof(pid)) { // Make sure that it has the right length
               if (getData((uint8_t*)&pid, sizeof(pid))) { // This will read the data and check the checksum
@@ -87,6 +91,122 @@ void parseSerialData() {
               Serial.println(msg.length);
             }
 #endif
+            break;
+          case GET_PID:
+            if (msg.length == 0) {
+              if (getData(NULL, 0)) { // This will read the data and check the checksum
+                msg.cmd = GET_PID;
+                msg.length = sizeof(pid);
+                pid.Kp = cfg.Kp * 100.0;
+                pid.Ki = cfg.Ki * 100.0;
+                pid.Kd = cfg.Kd * 100.0;
+                sendData((uint8_t*)&pid, sizeof(pid));
+              }
+#if DEBUG
+              else
+                Serial.println(F("GET_PID checksum error"));
+#endif
+            }
+            break;
+          case SET_TARGET:
+            if (msg.length == sizeof(target)) { // Make sure that it has the right length
+              if (getData((uint8_t*)&target, sizeof(target))) { // This will read the data and check the checksum
+                cfg.targetAngle = (double)target.targetAngle / 100.0;
+                updateEEPROMValues();
+              }
+#if DEBUG
+              else
+                Serial.println(F("SET_TARGET checksum error"));
+#endif
+            }
+#if DEBUG
+            else {
+              Serial.print(F("SET_TARGET length error: "));
+              Serial.println(msg.length);
+            }
+#endif
+            break;
+          case GET_TARGET:
+            if (msg.length == 0) {
+              if (getData(NULL, 0)) { // This will read the data and check the checksum
+                msg.cmd = GET_TARGET;
+                msg.length = sizeof(target);
+                target.targetAngle = cfg.targetAngle * 100.0;
+                sendData((uint8_t*)&target, sizeof(target));
+              }
+#if DEBUG
+              else
+                Serial.println(F("GET_PID checksum error"));
+#endif
+            }
+            break;
+          case SET_TURNING:
+            if (msg.length == sizeof(turning)) { // Make sure that it has the right length
+              if (getData((uint8_t*)&turning, sizeof(turning))) { // This will read the data and check the checksum
+                cfg.turningScale = turning.turningScale;
+                updateEEPROMValues();
+              }
+#if DEBUG
+              else
+                Serial.println(F("SET_TURNING checksum error"));
+#endif
+            }
+#if DEBUG
+            else {
+              Serial.print(F("SET_TURNING length error: "));
+              Serial.println(msg.length);
+            }
+#endif
+            break;
+          case GET_TURNING:
+            if (msg.length == 0) {
+              if (getData(NULL, 0)) { // This will read the data and check the checksum
+                msg.cmd = GET_TURNING;
+                msg.length = sizeof(turning);
+                turning.turningScale = cfg.turningScale;
+                sendData((uint8_t*)&turning, sizeof(turning));
+              }
+#if DEBUG
+              else
+                Serial.println(F("GET_TURNING checksum error"));
+#endif
+            }
+            break;
+          case SET_KALMAN:
+            if (msg.length == sizeof(kalman)) { // Make sure that it has the right length
+              if (getData((uint8_t*)&kalman, sizeof(kalman))) { // This will read the data and check the checksum
+                cfg.Qangle = kalman.Qangle / 10000.0;
+                cfg.Qbias = kalman.Qbias / 10000.0;
+                cfg.Rmeasure = kalman.Rmeasure / 10000.0;
+                updateEEPROMValues();
+              }
+#if DEBUG
+              else
+                Serial.println(F("SET_KALMAN checksum error"));
+#endif
+            }
+#if DEBUG
+            else {
+              Serial.print(F("SET_KALMAN length error: "));
+              Serial.println(msg.length);
+            }
+#endif
+            break;
+          case GET_KALMAN:
+            if (msg.length == 0) {
+              if (getData(NULL, 0)) { // This will read the data and check the checksum
+                msg.cmd = GET_KALMAN;
+                msg.length = sizeof(kalman);
+                kalman.Qangle = cfg.Qangle * 10000.0;
+                kalman.Qbias = cfg.Qbias * 10000.0;
+                kalman.Rmeasure = cfg.Rmeasure * 10000.0;
+                sendData((uint8_t*)&kalman, sizeof(kalman));
+              }
+#if DEBUG
+              else
+                Serial.println(F("GET_KALMAN checksum error"));
+#endif
+            }
             break;
 #if DEBUG
           default:
@@ -117,6 +237,7 @@ void parseSerialData() {
 // Carriage return and line feed ("\r\n")
 
 // All floats/doubles are multiplied by 100 before sending
+// Except the Kalman values which are multiplied by 10000 before sending
 
 bool getData(uint8_t *data, uint8_t length) {
   if (Serial.readBytes(data, length) != length) // Read data into buffer

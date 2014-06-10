@@ -46,9 +46,8 @@ void initDropdownlist() {
     if (Serial.list()[i].indexOf("/dev/cu.") != -1)
       continue; // Do not display /dev/cu.* devices
     dropdownList.addItem(Serial.list()[i], i); // This is the line doing the actual adding of items, we use the current loop we are in to determine what place in the char array to access and what item number to add it as
-    //if (Serial.list()[i].indexOf("HC-06") != -1) // Check for the "Balanduino" substring
     if (line != null && line.equals(Serial.list()[i]))
-      dropdownList.setValue(i); // Automaticly select the Balanduino balancing robot on Mac OS X and Linux
+      dropdownList.setValue(i); // Automatically select the last selected serial port
   }
 
   addMouseWheelListener(new MouseWheelListener() { // Add a mousewheel listener to scroll the dropdown list

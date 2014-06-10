@@ -23,7 +23,7 @@
 #include "I2C.h"
 #include "EEPROM.h"
 
-Kalman kalman;
+Kalman kalmanPitch;
 
 static const uint8_t IMUAddress = 0x68; // AD0 is logic low on the board
 
@@ -84,7 +84,7 @@ void initIMU() {
   // We then convert it to 0 to 2π and then from radians to degrees
   accAngle = (atan2((double)accY - cfg.accYzero, (double)accZ - cfg.accZzero)) * RAD_TO_DEG;
 
-  kalman.setAngle(accAngle); // Set starting angle
+  kalmanPitch.setAngle(accAngle); // Set starting angle
   pitch = accAngle;
   gyroAngle = accAngle;
 
@@ -139,7 +139,7 @@ void updateAngle() {
   uint32_t timer = micros();
   // This fixes the -180 to 180 transition problem when the accelerometer angle jumps between -180 and 180 degrees
   if ((accAngle < -90 && pitch > 90) || (accAngle > 90 && pitch < -90)) {
-    kalman.setAngle(accAngle);
+    kalmanPitch.setAngle(accAngle);
     pitch = accAngle;
     gyroAngle = accAngle;
   } else {
@@ -148,7 +148,7 @@ void updateAngle() {
     gyroAngle += gyroRate * dt; // Gyro angle is only used for debugging
     if (gyroAngle < -180 || gyroAngle > 180)
       gyroAngle = pitch; // Reset the gyro angle when it has drifted too much
-    pitch = kalman.getAngle(accAngle, gyroRate, dt); // Calculate the angle using a Kalman filter
+    pitch = kalmanPitch.getAngle(accAngle, gyroRate, dt); // Calculate the angle using a Kalman filter
   }
   kalmanTimer = timer;
   //Serial.print(accAngle);Serial.print('\t');Serial.print(gyroAngle);Serial.print('\t');Serial.println(pitch);
