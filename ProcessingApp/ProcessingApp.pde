@@ -310,7 +310,6 @@ void serialEvent(Serial serial) {
     println("Wrong header!");
     println(new String(bytes));
   }
-    
 
 /*
   else if (input[0].equals("I") && input.length == 4) { // Info
@@ -328,6 +327,7 @@ void serialEvent(Serial serial) {
     stringKalman = input[3];
   }
 */
+
   serial.clear();  // Empty the buffer
   drawValues = true; // Draw the graph
   append = false;

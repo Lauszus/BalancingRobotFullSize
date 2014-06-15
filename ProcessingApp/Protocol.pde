@@ -45,7 +45,7 @@ void getAllValues() {
 
 void setPID() {
   if (!P.getText().isEmpty() && !I.getText().isEmpty() && !D.getText().isEmpty()) {
-    int KpValue = (int)(Float.parseFloat(P.getText()) * 100.0); // All floats/doubles are multuplied by 100.0 before sending
+    int KpValue = (int)(Float.parseFloat(P.getText()) * 100.0); // All floats/doubles are multiplied by 100.0 before sending
     int KiValue = (int)(Float.parseFloat(I.getText()) * 100.0);
     int KdValue = (int)(Float.parseFloat(D.getText()) * 100.0);
 
@@ -73,8 +73,8 @@ void getPID() {
 
 void setTarget() {
   if (!targetAngle.getText().isEmpty()) {
-    int targetAngleValue = (int)(Float.parseFloat(targetAngle.getText()) * 100.0); // All floats/doubles are multuplied by 100.0 before sending
-    
+    int targetAngleValue = (int)(Float.parseFloat(targetAngle.getText()) * 100.0); // All floats/doubles are multiplied by 100.0 before sending
+
     byte output[] = {
       SET_TARGET, // Cmd
       2, // Length
@@ -100,7 +100,7 @@ void setTurning() {
     byte output[] = {
       SET_TURNING, // Cmd
       1, // Length
-      (byte)(turningValue & 0xFF),
+      turningValue,
     };
     sendCommand(output); // Set PID values
   }
@@ -144,14 +144,14 @@ void getKalman() {
 
 byte getChecksum(byte data[]) {
   byte checksum = 0;
-  for (int i = 0; i < data.length; i++)
-    checksum ^= data[i];
+  for (byte val : data)
+    checksum ^= val;
   return checksum;
 }
 
 int getChecksum(int data[]) {
   int checksum = 0;
-  for (int i = 0; i < data.length; i++)
-    checksum ^= data[i];
+  for (int val : data)
+    checksum ^= val;
   return checksum;
 }

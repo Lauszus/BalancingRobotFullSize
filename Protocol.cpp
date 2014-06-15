@@ -253,7 +253,7 @@ void sendData(uint8_t *data, uint8_t length) {
   Serial.write((uint8_t*)&msg, sizeof(msg));
   Serial.write(data, length);
   Serial.write(getCheckSum((uint8_t*)&msg, sizeof(msg)) ^ getCheckSum(data, length)); // The checksum is calculated from the length, command and the data
-  Serial.println(); // Print new line as well
+  Serial.println(); // Print carriage return and line feed as well
 }
 
 uint8_t getCheckSum(uint8_t *data, size_t length) {
