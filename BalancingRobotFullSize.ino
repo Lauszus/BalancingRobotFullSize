@@ -28,6 +28,7 @@
 #include "PID.h"
 
 double pitch; // Angle of the robot
+double turningValue; // The turning value of the steering rod
 
 uint32_t kalmanTimer; // Timer used for the Kalman filter
 static uint32_t pidTimer; // Timer used for the PID loop
@@ -92,8 +93,8 @@ void loop () {
       stopAndReset();
     } else {
       layingDown = false; // It's no longer laying down
-      double turning = getTurning() - zeroTurning;
-      updatePID(cfg.targetAngle, 0 /*targetOffset*/, turning, (double)(timer - pidTimer) / 1000000.0);
+      turningValue = getTurning() - zeroTurning;
+      updatePID(cfg.targetAngle, 0 /*targetOffset*/, turningValue, (double)(timer - pidTimer) / 1000000.0);
     }
     pidTimer = timer;
   }

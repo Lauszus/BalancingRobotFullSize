@@ -22,6 +22,8 @@
 #include "Motor.h"
 #include "EEPROM.h"
 
+double PIDValue; // Calculated PID value
+
 static double lastError; // Store last angle error
 static double integratedError; // Store integrated error
 
@@ -36,7 +38,7 @@ void updatePID(double restAngle, double offset, double turning, double dt) {
   double iTerm = (cfg.Ki * 100.0) * integratedError;
   double dTerm = (cfg.Kd / 100.0) * (error - lastError) / dt;
   lastError = error;
-  double PIDValue = pTerm + iTerm + dTerm;
+  PIDValue = pTerm + iTerm + dTerm;
 
 #if 0 // TODO: Estimate velocity and steer
   /* Steer robot sideways */

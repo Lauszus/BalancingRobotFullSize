@@ -18,7 +18,9 @@
 #include <Arduino.h>
 
 #include "Protocol.h"
+#include "BalancingRobotFullSize.h"
 #include "EEPROM.h"
+#include "PID.h"
 
 struct msg_t {
   uint8_t cmd;
@@ -45,6 +47,14 @@ struct kalman_t {
   uint16_t Rmeasure;
 } __attribute__((packed)) kalman;
 
+struct info_t {
+  uint16_t speed;
+  uint16_t current;
+  uint16_t turning;
+  uint8_t battery;
+  uint32_t runTime;
+} __attribute__((packed)) info;
+
 #define SET_PID     0
 #define GET_PID     1
 #define SET_TARGET  2
@@ -54,8 +64,14 @@ struct kalman_t {
 #define SET_KALMAN  6
 #define GET_KALMAN  7
 
+#define START_INFO  8
+#define STOP_INFO   9
+
 const char *commandHeader = "$S>"; // Standard command header
 const char *responseHeader = "$S<"; // Standard response header
+
+static bool sendSpeed;
+static uint32_t speedTimer;
 
 bool getData(uint8_t *data, uint8_t length);
 void sendData(uint8_t *data, uint8_t length);
@@ -92,6 +108,7 @@ void parseSerialData() {
             }
 #endif
             break;
+
           case GET_PID:
             if (msg.length == 0) {
               if (getData(NULL, 0)) { // This will read the data and check the checksum
@@ -108,6 +125,7 @@ void parseSerialData() {
 #endif
             }
             break;
+
           case SET_TARGET:
             if (msg.length == sizeof(target)) { // Make sure that it has the right length
               if (getData((uint8_t*)&target, sizeof(target))) { // This will read the data and check the checksum
@@ -126,6 +144,7 @@ void parseSerialData() {
             }
 #endif
             break;
+
           case GET_TARGET:
             if (msg.length == 0) {
               if (getData(NULL, 0)) { // This will read the data and check the checksum
@@ -140,6 +159,7 @@ void parseSerialData() {
 #endif
             }
             break;
+
           case SET_TURNING:
             if (msg.length == sizeof(turning)) { // Make sure that it has the right length
               if (getData((uint8_t*)&turning, sizeof(turning))) { // This will read the data and check the checksum
@@ -158,6 +178,7 @@ void parseSerialData() {
             }
 #endif
             break;
+
           case GET_TURNING:
             if (msg.length == 0) {
               if (getData(NULL, 0)) { // This will read the data and check the checksum
@@ -172,6 +193,7 @@ void parseSerialData() {
 #endif
             }
             break;
+
           case SET_KALMAN:
             if (msg.length == sizeof(kalman)) { // Make sure that it has the right length
               if (getData((uint8_t*)&kalman, sizeof(kalman))) { // This will read the data and check the checksum
@@ -192,6 +214,7 @@ void parseSerialData() {
             }
 #endif
             break;
+
           case GET_KALMAN:
             if (msg.length == 0) {
               if (getData(NULL, 0)) { // This will read the data and check the checksum
@@ -208,6 +231,29 @@ void parseSerialData() {
 #endif
             }
             break;
+
+          case START_INFO:
+            if (msg.length == 0) {
+              if (getData(NULL, 0)) // This will read the data and check the checksum
+                sendSpeed = true;
+#if DEBUG
+              else
+                Serial.println(F("START_INFO checksum error"));
+#endif
+            }
+            break;
+
+          case STOP_INFO:
+            if (msg.length == 0) {
+              if (getData(NULL, 0)) // This will read the data and check the checksum
+                sendSpeed = false;
+#if DEBUG
+              else
+                Serial.println(F("STOP_INFO checksum error"));
+#endif
+            }
+            break;
+
 #if DEBUG
           default:
             Serial.print(F("Unknown command: "));
@@ -217,6 +263,18 @@ void parseSerialData() {
         }
       }
     }
+  }
+
+  if (sendSpeed && millis() - speedTimer > 100) {
+    speedTimer = millis();
+    msg.cmd = START_INFO;
+    msg.length = sizeof(info);
+    info.speed = constrain(abs(PIDValue), 0, 100.0) * 100.0;
+    info.current = (double)analogRead(A1) / 204.6 * 30.0; // TODO: Convert to current
+    info.turning = turningValue * 100.0;
+    info.battery = (double)analogRead(A2) / 204.6 * 30.0; // TODO: Convert into batter level - note that it is uint8_t
+    info.runTime = speedTimer;
+    sendData((uint8_t*)&info, sizeof(info));
   }
 }
 

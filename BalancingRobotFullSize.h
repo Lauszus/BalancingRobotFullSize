@@ -21,6 +21,7 @@
 #include <stdint.h> // Needed for uint8_t, uint16_t etc.
 
 extern double pitch;
+extern double turningValue;
 extern uint32_t kalmanTimer;
 
 #endif
