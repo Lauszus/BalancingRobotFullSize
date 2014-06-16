@@ -19,6 +19,7 @@
 
 #include "Protocol.h"
 #include "BalancingRobotFullSize.h"
+#include "IMU.h"
 #include "EEPROM.h"
 #include "PID.h"
 
@@ -55,6 +56,12 @@ struct info_t {
   uint32_t runTime;
 } __attribute__((packed)) info;
 
+struct imu_t {
+  uint16_t acc;
+  uint16_t gyro;
+  uint16_t kalman;
+} __attribute__((packed)) imu;
+
 #define SET_PID     0
 #define GET_PID     1
 #define SET_TARGET  2
@@ -66,12 +73,14 @@ struct info_t {
 
 #define START_INFO  8
 #define STOP_INFO   9
+#define START_IMU  10
+#define STOP_IMU   11
 
 const char *commandHeader = "$S>"; // Standard command header
 const char *responseHeader = "$S<"; // Standard response header
 
-static bool sendSpeed;
-static uint32_t speedTimer;
+static bool sendSpeed, sendImu;
+static uint32_t speedTimer, imuTimer;
 
 bool getData(uint8_t *data, uint8_t length);
 void sendData(uint8_t *data, uint8_t length);
@@ -254,6 +263,28 @@ void parseSerialData() {
             }
             break;
 
+          case START_IMU:
+            if (msg.length == 0) {
+              if (getData(NULL, 0)) // This will read the data and check the checksum
+                sendImu = true;
+#if DEBUG
+              else
+                Serial.println(F("START_IMU checksum error"));
+#endif
+            }
+            break;
+
+          case STOP_IMU:
+            if (msg.length == 0) {
+              if (getData(NULL, 0)) // This will read the data and check the checksum
+                sendImu = false;
+#if DEBUG
+              else
+                Serial.println(F("STOP_IMU checksum error"));
+#endif
+            }
+            break;
+
 #if DEBUG
           default:
             Serial.print(F("Unknown command: "));
@@ -275,6 +306,16 @@ void parseSerialData() {
     info.battery = (double)analogRead(A2) / 204.6 * 30.0; // TODO: Convert into batter level - note that it is uint8_t
     info.runTime = speedTimer;
     sendData((uint8_t*)&info, sizeof(info));
+  }
+
+  if (sendImu && millis() - imuTimer > 100) {
+    imuTimer = millis();
+    msg.cmd = START_IMU;
+    msg.length = sizeof(imu);
+    imu.acc = accAngle * 100.0;
+    imu.gyro = gyroAngle * 100.0;
+    imu.kalman = pitch * 100.0;
+    sendData((uint8_t*)&imu, sizeof(imu));
   }
 }
 

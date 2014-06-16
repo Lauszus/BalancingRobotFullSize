@@ -22,6 +22,8 @@
 
 extern Kalman kalmanPitch;
 
+extern double accAngle, gyroAngle, pitch;
+
 void initIMU();
 void updateAngle();
 

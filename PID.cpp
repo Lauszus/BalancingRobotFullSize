@@ -18,7 +18,7 @@
 #include <Arduino.h>
 
 #include "PID.h"
-#include "BalancingRobotFullSize.h"
+#include "IMU.h"
 #include "Motor.h"
 #include "EEPROM.h"
 

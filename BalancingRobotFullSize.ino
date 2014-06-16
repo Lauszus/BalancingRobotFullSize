@@ -27,7 +27,6 @@
 #include "Protocol.h"
 #include "PID.h"
 
-double pitch; // Angle of the robot
 double turningValue; // The turning value of the steering rod
 
 uint32_t kalmanTimer; // Timer used for the Kalman filter

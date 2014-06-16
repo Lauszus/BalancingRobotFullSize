@@ -25,13 +25,15 @@
 
 Kalman kalmanPitch;
 
+double accAngle, gyroAngle, pitch; // Angle of the robot measure using the accelerometer, gyroscope and the Kalman filter
+
 static const uint8_t IMUAddress = 0x68; // AD0 is logic low on the board
 
 static int16_t accY, accZ, gyroX;
 static double gyroXzero;
 static uint8_t i2cBuffer[8]; // Buffer for I2C data
 
-static double accAngle, gyroRate, gyroAngle;
+static double gyroRate;
 
 bool calibrateGyro();
 bool checkMinMax(int16_t *array, uint8_t length, int16_t maxDifference);
