@@ -28,7 +28,7 @@
 #include "PID.h"
 
 double turningValue; // The turning value of the steering rod
-uint16_t batteryLevel; // Battery level multiplied by 10 i.e. 24.5V becomes 245
+uint16_t batteryLevel; // Battery level multiplied by 100 i.e. 24.50V becomes 2450
 
 uint32_t kalmanTimer; // Timer used for the Kalman filter
 static uint32_t pidTimer; // Timer used for the PID loop
@@ -101,7 +101,7 @@ void loop () {
 
     if (++batteryCounter > 100) {
       batteryCounter = 0;
-      batteryLevel = (double)analogRead(A1) / 204.6 * 57.0; // It is connected to a 47k-10k voltage divider and then we multiply this by 10, so 12.5V will be equal to 125 - the voltage divider is connected to an op amp configured as a buffer
+      batteryLevel = (double)analogRead(A1) / 204.6 * 570.0; // It is connected to a 47k-10k voltage divider and then we multiply this by 100, so 12.50V will be equal to 1250 - the voltage divider is connected to an op amp configured as a buffer
     }
   }
 

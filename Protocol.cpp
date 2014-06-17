@@ -304,7 +304,7 @@ void parseSerialData() {
     double CS = ((double)analogRead(A6) / 204.6 - 2.5) / 0.066 * 100.0; // 66mV/A and then multiply by 100.0
     CS += ((double)analogRead(A7) / 204.6 - 2.5) / 0.066 * 100.0;
     info.current = CS / 2; // Take average between the two motors
-    info.turning = turningValue;// * 100.0;
+    info.turning = turningValue * 100.0;
     info.battery = batteryLevel;
     info.runTime = speedTimer;
     sendData((uint8_t*)&info, sizeof(info));
