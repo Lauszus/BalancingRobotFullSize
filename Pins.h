@@ -28,8 +28,8 @@
 /* Pin connect to INT on the MPU-6050 */
 #define dataReady P2
 
-#define buzzer P13 // Buzzer used for audio feedback
-#define deadmanButton P15 // (A1) Deadman button
+#define buzzer P7 // Buzzer used for audio feedback
+#define deadmanButton P13 // Deadman button
 
 /* Left motor */
 #define leftDir P12
@@ -42,10 +42,10 @@
 #define rightPWMReg OCR1A
 
 /* Pins connected to the motor drivers diagnostic pins */
-/*#define leftF1 P5
+#define leftF1 P5
 #define leftF2 P6
 
-#define rightF1 P5
-#define rightF2 P6*/
+#define rightF1 P3
+#define rightF2 P4
 
 #endif
