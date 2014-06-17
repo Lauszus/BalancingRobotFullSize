@@ -83,6 +83,7 @@ void updatePID(double restAngle, double offset, double turning, double dt) {
 }
 
 void stopAndReset() {
+  PIDValue = 0;
   stopMotor(left);
   stopMotor(right);
   lastError = 0;

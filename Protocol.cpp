@@ -50,9 +50,9 @@ struct kalman_t {
 
 struct info_t {
   uint16_t speed;
-  uint16_t current;
-  uint16_t turning;
-  uint8_t battery;
+  int16_t current;
+  int16_t turning;
+  uint16_t battery;
   uint32_t runTime;
 } __attribute__((packed)) info;
 
@@ -301,9 +301,11 @@ void parseSerialData() {
     msg.cmd = START_INFO;
     msg.length = sizeof(info);
     info.speed = constrain(abs(PIDValue), 0, 100.0) * 100.0;
-    info.current = (double)analogRead(A1) / 204.6 * 30.0; // TODO: Convert to current
-    info.turning = turningValue * 100.0;
-    info.battery = (double)analogRead(A2) / 204.6 * 30.0; // TODO: Convert into batter level - note that it is uint8_t
+    double CS = ((double)analogRead(A6) / 204.6 - 2.5) / 0.066 * 100.0; // 66mV/A and then multiply by 100.0
+    CS += ((double)analogRead(A7) / 204.6 - 2.5) / 0.066 * 100.0;
+    info.current = CS / 2; // Take average between the two motors
+    info.turning = turningValue;// * 100.0;
+    info.battery = batteryLevel;
     info.runTime = speedTimer;
     sendData((uint8_t*)&info, sizeof(info));
   }

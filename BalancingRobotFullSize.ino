@@ -28,13 +28,14 @@
 #include "PID.h"
 
 double turningValue; // The turning value of the steering rod
+uint16_t batteryLevel; // Battery level multiplied by 10 i.e. 24.5V becomes 245
 
 uint32_t kalmanTimer; // Timer used for the Kalman filter
 static uint32_t pidTimer; // Timer used for the PID loop
 
 static bool layingDown; // Used to indicate if the robot is laying down or the button is pressed
-
-static double zeroTurning;
+static double zeroTurning; // Used for calibration of the steer at startup
+static uint8_t batteryCounter;
 
 double getTurning() {
   double turning = (double)analogRead(A0) / 204.6 - 2.5; // First convert reading to voltage and then subtract 2.5V, as this is the center of the steering wheel
@@ -82,6 +83,8 @@ void loop () {
   if (dataReady::IsSet()) { // Check is new data is ready
     updateAngle();
 
+    turningValue = getTurning() - zeroTurning; // Update turning value
+
     /* Drive motors */
     uint32_t timer = micros();
     // If the robot is laying down, it has to be put in a vertical position before it starts balancing
@@ -92,10 +95,14 @@ void loop () {
       stopAndReset();
     } else {
       layingDown = false; // It's no longer laying down
-      turningValue = getTurning() - zeroTurning;
       updatePID(cfg.targetAngle, 0 /*targetOffset*/, turningValue, (double)(timer - pidTimer) / 1000000.0);
     }
     pidTimer = timer;
+
+    if (++batteryCounter > 100) {
+      batteryCounter = 0;
+      batteryLevel = (double)analogRead(A1) / 204.6 * 57.0; // It is connected to a 47k-10k voltage divider and then we multiply this by 10, so 12.5V will be equal to 125 - the voltage divider is connected to an op amp configured as a buffer
+    }
   }
 
   parseSerialData(); // Parse incoming serial data

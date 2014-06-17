@@ -22,5 +22,6 @@
 
 extern double turningValue;
 extern uint32_t kalmanTimer;
+extern uint16_t batteryLevel;
 
 #endif

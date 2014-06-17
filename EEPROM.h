@@ -24,7 +24,6 @@
 typedef struct {
   double Kp, Ki, Kd; // PID variables
   double targetAngle; // Resting angle of the robot
-  //uint8_t controlAngleLimit; // Set the maximum tilting angle of the robot - TODO: Use this for maximum angle before it gives up
   uint8_t turningScale; // Set the turning scale value
   double Qangle, Qbias, Rmeasure; // Kalman filter values
   double accYzero, accZzero; // Accelerometer zero values
