@@ -48,4 +48,9 @@
 #define rightF1 P3
 #define rightF2 P4
 
+#define STEER_PIN A0
+#define VBAT_PIN  A1
+#define CS1_PIN  A6
+#define CS2_PIN  A7
+
 #endif

@@ -22,6 +22,7 @@
 #include "IMU.h"
 #include "EEPROM.h"
 #include "PID.h"
+#include "Pins.h"
 
 struct msg_t {
   uint8_t cmd;
@@ -301,9 +302,9 @@ void parseSerialData() {
     msg.cmd = START_INFO;
     msg.length = sizeof(info);
     info.speed = constrain(abs(PIDValue), 0, 100.0) * 100.0;
-    double CS = ((double)analogRead(A6) / 204.6 - 2.5) / 0.066 * 100.0; // 66mV/A and then multiply by 100.0
-    CS += ((double)analogRead(A7) / 204.6 - 2.5) / 0.066 * 100.0;
     info.current = CS / 2; // Take average between the two motors
+      double CS = ((double)analogRead(CS1_PIN) / 204.6 - 2.5) / 0.066 * 100.0; // 66mV/A and then multiply by 100.0
+      CS += ((double)analogRead(CS2_PIN) / 204.6 - 2.5) / 0.066 * 100.0;
     info.turning = turningValue * 100.0;
     info.battery = batteryLevel;
     info.runTime = speedTimer;

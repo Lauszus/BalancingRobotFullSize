@@ -38,7 +38,7 @@ static double zeroTurning; // Used for calibration of the steer at startup
 static uint8_t batteryCounter;
 
 double getTurning() {
-  double turning = (double)analogRead(A0) / 204.6 - 2.5; // First convert reading to voltage and then subtract 2.5V, as this is the center of the steering wheel
+  double turning = (double)analogRead(STEER_PIN) / 204.6 - 2.5; // First convert reading to voltage and then subtract 2.5V, as this is the center of the steering wheel
   turning *= cfg.turningScale; // Scale the turning value, so it will actually turn
   //Serial.println(turning);
   return turning;
@@ -101,7 +101,7 @@ void loop () {
 
     if (++batteryCounter > 100) {
       batteryCounter = 0;
-      batteryLevel = (double)analogRead(A1) / 204.6 * 570.0; // It is connected to a 47k-10k voltage divider and then we multiply this by 100, so 12.50V will be equal to 1250 - the voltage divider is connected to an op amp configured as a buffer
+      batteryLevel = (double)analogRead(VBAT_PIN) / 204.6 * 780.0; // It is connected to a 68k-10k voltage divider and then we multiply this by 100, so 12.50V will be equal to 1250 - the voltage divider is connected to an op amp configured as a buffer
     }
   }
 
