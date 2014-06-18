@@ -108,7 +108,6 @@ void loop () {
         buzzer::Clear();
       // TODO: Calibrate this value
     }
-  }
-
-  parseSerialData(); // Parse incoming serial data
+  } else
+    parseSerialData(); // Parse incoming serial data
 }
