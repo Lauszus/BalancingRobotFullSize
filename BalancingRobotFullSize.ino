@@ -102,7 +102,7 @@ void loop () {
     if (++batteryCounter > 100) {
       batteryCounter = 0;
       batteryLevel = (double)analogRead(VBAT_PIN) / 204.6 * 780.0; // It is connected to a 68k-10k voltage divider and then we multiply this by 100, so 12.50V will be equal to 1250 - the voltage divider is connected to an op amp configured as a buffer
-      if (batteryLevel < 2160) // Equal to 3.6V per cell - 21.60V in total
+      if (batteryLevel < 2160 && batteryLevel > 500) // Equal to 3.6V per cell (21.60V in total) - don't turn on if it's below 5V, this means that no battery is connected
         buzzer::Set();
       else
         buzzer::Clear();
