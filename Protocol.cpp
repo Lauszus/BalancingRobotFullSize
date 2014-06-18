@@ -302,9 +302,12 @@ void parseSerialData() {
     msg.cmd = START_INFO;
     msg.length = sizeof(info);
     info.speed = constrain(abs(PIDValue), 0, 100.0) * 100.0;
-    info.current = CS / 2; // Take average between the two motors
+    if (deadmanButton::IsSet()) {
       double CS = ((double)analogRead(CS1_PIN) / 204.6 - 2.5) / 0.066 * 100.0; // 66mV/A and then multiply by 100.0
       CS += ((double)analogRead(CS2_PIN) / 204.6 - 2.5) / 0.066 * 100.0;
+      info.current = CS / 2; // Take average between the two motors
+    } else
+      info.current = 0; // When the reset button is held low on the motor drivers, the current sensor will give out an incorrect value
     info.turning = turningValue * 100.0;
     info.battery = batteryLevel;
     info.runTime = speedTimer;
