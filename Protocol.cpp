@@ -312,9 +312,7 @@ void parseSerialData() {
     info.battery = batteryLevel;
     info.runTime = speedTimer;
     sendData((uint8_t*)&info, sizeof(info));
-  }
-
-  if (sendImu && millis() - imuTimer > 100) {
+  } else if (sendImu && millis() - imuTimer > 100) {
     imuTimer = millis();
     msg.cmd = START_IMU;
     msg.length = sizeof(imu);
