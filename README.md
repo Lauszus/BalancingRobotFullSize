@@ -6,6 +6,8 @@ _________
 
 This is the code for my full size balancing robot.
 
+Both our paper and poster can be found inside the [Documents](Documents) directory.
+
 The code is still in progress. I will update this readme with more information later on.
 
 For more information send me an email at <kristianl@tkjelectronics.dk>.
