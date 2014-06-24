@@ -305,7 +305,7 @@ void parseSerialData() {
     if (deadmanButton::IsSet()) {
       double CS = ((double)analogRead(CS1_PIN) / 204.6 - 2.5) / 0.066 * 100.0; // 66mV/A and then multiply by 100.0
       CS += ((double)analogRead(CS2_PIN) / 204.6 - 2.5) / 0.066 * 100.0;
-      info.current = CS / 2; // Take average between the two motors
+      info.current = CS;
     } else
       info.current = 0; // When the reset button is held low on the motor drivers, the current sensor will give out an incorrect value
     info.turning = turningValue * 100.0;
@@ -356,7 +356,7 @@ void sendData(uint8_t *data, uint8_t length) {
   Serial.write((uint8_t*)&msg, sizeof(msg));
   Serial.write(data, length);
   Serial.write(getCheckSum((uint8_t*)&msg, sizeof(msg)) ^ getCheckSum(data, length)); // The checksum is calculated from the length, command and the data
-  Serial.println(); // Print carriage return and line feed as well
+  Serial.println(); // Print carriage return and line feed as well, so it is easy to figure out the line ending in Java
 }
 
 uint8_t getCheckSum(uint8_t *data, size_t length) {
