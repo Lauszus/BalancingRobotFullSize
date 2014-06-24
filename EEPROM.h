@@ -26,6 +26,7 @@ typedef struct {
   double targetAngle; // Resting angle of the robot
   uint8_t turningScale; // Set the turning scale value
   double Qangle, Qbias, Rmeasure; // Kalman filter values
+  // TODO: Implement this:
   double accYzero, accZzero; // Accelerometer zero values
   double leftMotorScaler, rightMotorScaler; // Used if there is difference between the motors
 } cfg_t;

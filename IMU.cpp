@@ -25,7 +25,7 @@
 
 Kalman kalmanPitch;
 
-double accAngle, gyroAngle, pitch; // Angle of the robot measure using the accelerometer, gyroscope and the Kalman filter
+double accAngle, gyroAngle, pitch; // Angle of the robot measured using the accelerometer, gyroscope and the Kalman filter
 
 static const uint8_t IMUAddress = 0x68; // AD0 is logic low on the board
 
@@ -77,7 +77,7 @@ void initIMU() {
 
   dataReady::SetDirRead();
 
-  delay(100); // Wait for the sensor to get ready
+  delay(100); // Wait for the sensor to get stabilized
 
   /* Set Kalman and gyro starting angle */
   updateIMUValues();

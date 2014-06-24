@@ -29,7 +29,7 @@
 #define dataReady P2
 
 #define buzzer P7 // Buzzer used for audio feedback
-#define deadmanButton P13 // Deadman button
+#define deadmanButton P16 // (A2) Deadman button
 
 /* Left motor */
 #define leftDir P12
@@ -48,6 +48,7 @@
 #define rightF1 P3
 #define rightF2 P4
 
+/* Analog pins */
 #define STEER_PIN A0
 #define VBAT_PIN  A1
 #define CS1_PIN   A6
