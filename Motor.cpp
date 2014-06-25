@@ -24,12 +24,12 @@ const uint16_t PWMVALUE = F_CPU / PWM_FREQUENCY / 2; // The frequency is given b
 void setPWM(Command motor, uint16_t dutyCycle);
 
 void initMotors() {
-  /* Set the motordriver diagnostic pins to inputs */
-/*  leftF1::SetDirRead();
+  /* Set the motor driver diagnostic pins to inputs */
+  leftF1::SetDirRead();
   leftF2::SetDirRead();
   rightF1::SetDirRead();
   rightF2::SetDirRead();
-*/
+
   /* Setup motor pins to output */
   leftPWM::SetDirWrite();
   leftDir::SetDirWrite();

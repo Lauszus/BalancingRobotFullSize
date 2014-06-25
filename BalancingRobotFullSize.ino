@@ -78,7 +78,19 @@ void setup() {
 }
 
 void loop () {
-  // TODO: Check motor diagnostic pins
+#if 0
+  if (leftF1::IsSet() || leftF2::IsSet() || rightF1::IsSet() || rightF2::IsSet()) { // Check the diagnostic pins
+    buzzer::Set();
+    Serial.print(F("Diagnostic error: "));
+    Serial.print(leftF1::IsSet());
+    Serial.write('\t');
+    Serial.print(leftF2::IsSet());
+    Serial.write('\t');
+    Serial.print(rightF1::IsSet());
+    Serial.write('\t');
+    Serial.println(rightF2::IsSet());
+  }
+#endif
 
   if (dataReady::IsSet()) { // Check is new data is ready
     updateAngle();
