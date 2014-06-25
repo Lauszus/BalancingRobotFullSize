@@ -40,6 +40,15 @@ void updatePID(double restAngle, double offset, double turning, double dt) {
   lastError = error;
   PIDValue = pTerm + iTerm + dTerm;
 
+  currentSpeed = (currentSpeed + PIDValue * 0.004) * 0.999; // TODO: Explain this
+  //currentSpeed = constrain(currentSpeed, -50, 50);
+
+  //Serial.print(PIDValue); Serial.write('\t'); Serial.print(currentSpeed); Serial.write('\t');
+
+  PIDValue += currentSpeed;
+
+  //Serial.println(PIDValue);
+
 #if 0 // TODO: Estimate velocity and steer
   /* Steer robot sideways */
   if (turning < 0) { // Left
@@ -52,15 +61,6 @@ void updatePID(double restAngle, double offset, double turning, double dt) {
       turning = 0;
   }
 #endif
-
-  currentSpeed = (currentSpeed + PIDValue * 0.004) * 0.999; // TODO: Explain this
-  currentSpeed = constrain(currentSpeed, -50, 50);
-
-  //Serial.print(PIDValue); Serial.write('\t'); Serial.print(currentSpeed); Serial.write('\t');
-
-  PIDValue += currentSpeed;
-
-  //Serial.println(PIDValue);
 
   // TODO: Turn opposite when going backwards
   double PIDLeft = PIDValue - turning;
