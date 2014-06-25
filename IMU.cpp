@@ -84,7 +84,7 @@ void initIMU() {
 
   // atan2 outputs the value of -π to π (radians) - see http://en.wikipedia.org/wiki/Atan2
   // We then convert it to 0 to 2π and then from radians to degrees
-  accAngle = (atan2((double)accY - cfg.accYzero, (double)accZ - cfg.accZzero)) * RAD_TO_DEG;
+  accAngle = (atan2(-((double)accY - cfg.accYzero), -((double)accZ - cfg.accZzero))) * RAD_TO_DEG;
 
   kalmanPitch.setAngle(accAngle); // Set starting angle
   pitch = accAngle;
@@ -136,7 +136,7 @@ void updateAngle() {
 
   // atan2 outputs the value of -π to π (radians) - see http://en.wikipedia.org/wiki/Atan2
   // We then convert it to 0 to 2π and then from radians to degrees
-  accAngle = (atan2((double)accY - cfg.accYzero, (double)accZ - cfg.accZzero)) * RAD_TO_DEG;
+  accAngle = (atan2(-((double)accY - cfg.accYzero), -((double)accZ - cfg.accZzero))) * RAD_TO_DEG;
 
   uint32_t timer = micros();
   // This fixes the -180 to 180 transition problem when the accelerometer angle jumps between -180 and 180 degrees

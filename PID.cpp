@@ -63,8 +63,8 @@ void updatePID(double restAngle, double offset, double turning, double dt) {
   //Serial.println(PIDValue);
 
   // TODO: Turn opposite when going backwards
-  double PIDLeft = PIDValue + turning;
-  double PIDRight = PIDValue - turning;
+  double PIDLeft = PIDValue - turning;
+  double PIDRight = PIDValue + turning;
 
   PIDLeft *= cfg.leftMotorScaler; // Compensate for difference in some of the motors
   PIDRight *= cfg.rightMotorScaler;
