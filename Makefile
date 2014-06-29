@@ -12,6 +12,6 @@ BOARD = pro
 BOARD_SUB = pro.menu.cpu.16MHzatmega328
 MON_SPEED = 57600
 
-INC_DIRS = ../BalancingRobotFullSize/KalmanFilter
+INC_DIRS = $(CURDIR)/KalmanFilter
 
 include Arduino_Makefile_master/_Makefile.master
