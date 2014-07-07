@@ -10,6 +10,6 @@ Both our paper and poster can be found inside the [Documents](Documents) directo
 
 I have also written an Android application for the robot. The source code is available at the following link: <https://github.com/Lauszus/BalancingRobotFullSizeAndroid>.
 
-The code is still in progress. I will update this readme with more information later on.
+Detailed information can be found at the blog post: <http://blog.tkjelectronics.dk/2014/07/full-size-diy-balancing-robot/>.
 
 For more information send me an email at <kristianl@tkjelectronics.dk>.
