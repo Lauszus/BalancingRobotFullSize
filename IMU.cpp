@@ -29,11 +29,9 @@ double accAngle, gyroAngle, pitch; // Angle of the robot measured using the acce
 
 static const uint8_t IMUAddress = 0x68; // AD0 is logic low on the board
 
-static int16_t accY, accZ, gyroX;
+static int16_t gyroX;
 static double gyroXzero;
 static uint8_t i2cBuffer[8]; // Buffer for I2C data
-
-static double gyroRate;
 
 bool calibrateGyro();
 bool checkMinMax(int16_t *array, uint8_t length, int16_t maxDifference);
@@ -78,13 +76,10 @@ void initIMU() {
   dataReady::SetDirRead();
 
   delay(100); // Wait for the sensor to get stabilized
+  while (!dataReady::IsSet()); // Wait until new data is ready - it should be after the 100ms delay, but this is here just to make sure
 
   /* Set Kalman and gyro starting angle */
   updateIMUValues();
-
-  // atan2 outputs the value of -π to π (radians) - see http://en.wikipedia.org/wiki/Atan2
-  // We then convert it to 0 to 2π and then from radians to degrees
-  accAngle = (atan2(-((double)accY - cfg.accYzero), -((double)accZ - cfg.accZzero))) * RAD_TO_DEG;
 
   kalmanPitch.setAngle(accAngle); // Set starting angle
   pitch = accAngle;
@@ -97,6 +92,7 @@ void initIMU() {
 bool calibrateGyro() {
   int16_t gyroXbuffer[25];
   for (uint8_t i = 0; i < 25; i++) {
+    while (!dataReady::IsSet()); // Wait until new data is ready
     while (i2cRead(IMUAddress, 0x43, i2cBuffer, 2));
     gyroXbuffer[i] = ((i2cBuffer[0] << 8) | i2cBuffer[1]);
     delay(10);
@@ -125,18 +121,18 @@ bool checkMinMax(int16_t *array, uint8_t length, int16_t maxDifference) { // Use
 
 void updateIMUValues() {
   while (i2cRead(IMUAddress, 0x3D, i2cBuffer, 8));
-  accY = ((i2cBuffer[0] << 8) | i2cBuffer[1]);
-  accZ = ((i2cBuffer[2] << 8) | i2cBuffer[3]);
+  int16_t accY = ((i2cBuffer[0] << 8) | i2cBuffer[1]);
+  int16_t accZ = ((i2cBuffer[2] << 8) | i2cBuffer[3]);
   gyroX = ((i2cBuffer[6] << 8) | i2cBuffer[7]);
+
+  // atan2 outputs the value of -π to π (radians) - see http://en.wikipedia.org/wiki/Atan2
+  // We then convert it to 0 to 2π and then from radians to degrees
+  accAngle = (atan2(-((double)accY - cfg.accYzero), -((double)accZ - cfg.accZzero))) * RAD_TO_DEG;
 }
 
 void updateAngle() {
   /* Calculate pitch */
   updateIMUValues();
-
-  // atan2 outputs the value of -π to π (radians) - see http://en.wikipedia.org/wiki/Atan2
-  // We then convert it to 0 to 2π and then from radians to degrees
-  accAngle = (atan2(-((double)accY - cfg.accYzero), -((double)accZ - cfg.accZzero))) * RAD_TO_DEG;
 
   uint32_t timer = micros();
   // This fixes the -180 to 180 transition problem when the accelerometer angle jumps between -180 and 180 degrees
@@ -145,7 +141,7 @@ void updateAngle() {
     pitch = accAngle;
     gyroAngle = accAngle;
   } else {
-    gyroRate = ((double)gyroX - gyroXzero) / 131.0; // Convert to deg/s
+    double gyroRate = ((double)gyroX - gyroXzero) / 131.0; // Convert to deg/s
     double dt = (double)(timer - kalmanTimer) / 1000000.0;
     gyroAngle += gyroRate * dt; // Gyro angle is only used for debugging
     if (gyroAngle < -180 || gyroAngle > 180)
