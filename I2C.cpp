@@ -24,7 +24,11 @@ static const uint8_t I2C_TIMEOUT = 100; // Used to check for errors in I2C commu
 
 void initI2c() {
   Wire.begin();
-  TWBR = ((F_CPU / 400000L) - 16) / 2; // Set I2C frequency to 400kHz
+#if ARDUINO >= 157
+  Wire.setClock(400000UL); // Set I2C frequency to 400kHz
+#else
+  TWBR = ((F_CPU / 400000UL) - 16) / 2; // Set I2C frequency to 400kHz
+#endif
 }
 
 uint8_t i2cWrite(uint8_t address, uint8_t registerAddress, uint8_t data, bool sendStop /*= true*/) {
