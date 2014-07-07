@@ -27,6 +27,10 @@
 #include "Protocol.h"
 #include "PID.h"
 
+#if NUM_ANALOG_INPUTS != 8
+#error "Please update the Arduino IDE to version 1.5.7 or above - see: https://github.com/arduino/Arduino/pull/2148"
+#endif
+
 double turningValue; // The turning value of the steering rod
 uint16_t batteryLevel; // Battery level multiplied by 100 i.e. 24.50V becomes 2450
 
