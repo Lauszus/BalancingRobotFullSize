@@ -51,8 +51,8 @@ struct kalman_t {
 
 struct info_t {
   uint16_t speed;
-  int16_t current;
-  int16_t turning;
+  int16_t current; // Note that this can be negative as well
+  int16_t turning; // Note that this can be negative as well
   uint16_t battery;
   uint32_t runTime;
 } __attribute__((packed)) info;
