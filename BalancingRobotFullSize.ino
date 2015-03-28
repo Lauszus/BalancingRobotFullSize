@@ -27,7 +27,7 @@
 #include "Protocol.h"
 #include "PID.h"
 
-#if NUM_ANALOG_INPUTS != 8
+#if defined(__AVR_ATmega328P__) && NUM_ANALOG_INPUTS != 8
 #error "Please update the Arduino IDE to version 1.5.7 or above - see: https://github.com/arduino/Arduino/pull/2148"
 #endif
 
