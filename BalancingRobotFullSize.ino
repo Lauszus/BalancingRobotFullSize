@@ -71,6 +71,10 @@ void setup() {
 
   zeroTurning = getTurning(); // Calibrate turning
 
+  /* Set turning pins used for turning signals */
+  turningLeft::SetDirWrite();
+  turningRight::SetDirWrite();
+
   /* Beep to indicate that it is now ready */
   buzzer::Set();
   delay(100);
@@ -86,6 +90,17 @@ void loop () {
     updateAngle();
 
     turningValue = getTurning() - zeroTurning; // Update turning value
+
+    /* Set turning signals */
+    if (turningValue > 5)
+      turningLeft::Set();
+    else
+      turningLeft::Clear();
+
+    if (turningValue < -5)
+      turningRight::Set();
+    else
+      turningRight::Clear();
 
     /* Drive motors */
     uint32_t timer = micros();

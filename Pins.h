@@ -54,4 +54,8 @@
 #define CS1_PIN   A6
 //#define CS2_PIN   A7
 
+/* Turn signals */
+#define turningLeft P5
+#define turningRight P6
+
 #endif
