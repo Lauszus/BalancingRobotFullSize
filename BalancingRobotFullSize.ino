@@ -92,15 +92,8 @@ void loop () {
     turningValue = getTurning() - zeroTurning; // Update turning value
 
     /* Set turning signals */
-    if (turningValue > 5)
-      turningLeft::Set();
-    else
-      turningLeft::Clear();
-
-    if (turningValue < -5)
-      turningRight::Set();
-    else
-      turningRight::Clear();
+    turningLeft::Set(turningValue > 5);
+    turningRight::Set(turningValue < -5);
 
     /* Drive motors */
     uint32_t timer = micros();
