@@ -54,6 +54,10 @@ void loop() {
       rightState = !rightState;
     }
     setRightTurn(rightState);
+  } else {
+    timer = millis(); // Reset timer
+    leftState = false; // Set both states back to off
+    rightState = false;
   }
 
   pixels.show();
