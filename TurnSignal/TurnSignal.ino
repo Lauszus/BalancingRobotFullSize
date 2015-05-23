@@ -28,7 +28,7 @@ static const uint8_t turningLeftPin = A2, turningRightPin = A1, pixelsPin = A3;
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUM_PIXELS, pixelsPin, NEO_GRB + NEO_KHZ800);
 
-bool turnSignalState;
+bool turnSignalState, turning;
 uint32_t timer; // Left and right turn signals can't be on at the same time, so we can just use the same timer for both
 
 void setup() {
@@ -44,6 +44,7 @@ void loop() {
   bool turningLeft = digitalRead(turningLeftPin);
   bool turningRight = digitalRead(turningRightPin);
   if (turningLeft || turningRight) {
+    turning = true;
     if ((int32_t)(millis() - timer) > 250) { // Blink every 250 ms
       timer = millis();
       turnSignalState = !turnSignalState;
@@ -52,7 +53,9 @@ void loop() {
       setLeftTurn(turnSignalState);
     else if (turningRight)
       setRightTurn(turnSignalState);
-  } else {
+  } else if (turning) {
+    turning = false;
+    delay(250 - (int32_t)(millis() - timer));
     timer = millis(); // Reset timer
     turnSignalState = false; // Set LED state back to off
   }
