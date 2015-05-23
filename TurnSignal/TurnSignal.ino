@@ -30,7 +30,7 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUM_PIXELS, pixelsPin, NEO_GRB + NE
 
 bool leftState, rightState;
 
-uint32_t timer; // Left and right can't be on at the same time, so we can just use the same timer for both
+uint32_t timer; // Left and right turn signals can't be on at the same time, so we can just use the same timer for both
 
 void setup() {
   pinMode(turningLeftPin, INPUT);
@@ -40,7 +40,7 @@ void setup() {
 }
 
 void loop() {
-  setMiddleBackOn(); // Set all lights on. This will get overriden by left and right turn signals
+  setMiddleAndBackOn(); // Set all lights on. This may get overriden by left and right turn signals
 
   if (digitalRead(turningLeftPin)) {
     if ((int32_t)(millis() - timer) > 250) { // Blink every 250 ms
@@ -48,8 +48,7 @@ void loop() {
       leftState = !leftState;
     }
     setLeftTurn(leftState);
-  }
-  else if (digitalRead(turningRightPin)) {
+  } else if (digitalRead(turningRightPin)) {
     if ((int32_t)(millis() - timer) > 250) { // Blink every 250 ms
       timer = millis();
       rightState = !rightState;
@@ -60,21 +59,21 @@ void loop() {
   pixels.show();
 }
 
-void setMiddleBackOn() {
+void setMiddleAndBackOn() {
   for (uint8_t i = 0; i < NUM_PIXELS / 2; i++)
     pixels.setPixelColor(i, RED); // Back LEDs
   for (uint8_t i = NUM_PIXELS / 2; i < NUM_PIXELS; i++)
     pixels.setPixelColor(i, GREEN); // Front LEDs
 }
 
-void setLeftTurn(bool enable) {
+void setLeftTurn(bool enable) { // The left turn signals are in the ends of the LED strip
   for (uint8_t i = 0; i < TURN_PIXELS; i++)
     pixels.setPixelColor(i, enable ? ORANGE : 0);
   for (uint8_t i = NUM_PIXELS - TURN_PIXELS; i < NUM_PIXELS; i++)
     pixels.setPixelColor(i, enable ? ORANGE : 0);
 }
 
-void setRightTurn(bool enable) {
+void setRightTurn(bool enable) { // The right turn signals are in the center of the LED strip
   for (uint8_t i = NUM_PIXELS / 2 - TURN_PIXELS; i < NUM_PIXELS / 2 + TURN_PIXELS; i++)
     pixels.setPixelColor(i, enable ? ORANGE : 0);
 }
