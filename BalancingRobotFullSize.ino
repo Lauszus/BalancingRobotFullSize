@@ -92,8 +92,14 @@ void loop () {
     turningValue = getTurning() - zeroTurning; // Update turning value
 
     /* Set turning signals */
-    turningLeft::Set(turningValue > 5);
-    turningRight::Set(turningValue < -5);
+    static bool turning; // Used for a deadband in the middle, so the LEDs do not flicker
+    if (abs(turningValue) > 5)
+      turning = true;
+    else if (abs(turningValue) < 1)
+      turning = false;
+
+    turningLeft::Set(turning && turningValue > 1);
+    turningRight::Set(turning && turningValue < -1);
 
     /* Drive motors */
     uint32_t timer = micros();
