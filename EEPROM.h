@@ -18,8 +18,6 @@
 #ifndef _eeprom_h_
 #define _eeprom_h_
 
-#include <stdint.h> // Needed for uint8_t, uint16_t etc.
-
 // This struct will store all the configuration values
 typedef struct {
   double Kp, Ki, Kd; // PID variables

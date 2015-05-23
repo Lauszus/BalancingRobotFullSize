@@ -18,8 +18,6 @@
 #ifndef _balancingrobotfullsize_h_
 #define _balancingrobotfullsize_h_
 
-#include <stdint.h> // Needed for uint8_t, uint16_t etc.
-
 extern double turningValue;
 extern uint32_t kalmanTimer;
 extern uint16_t batteryLevel;
