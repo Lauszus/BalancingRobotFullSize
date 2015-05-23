@@ -54,9 +54,6 @@ void loop() {
       rightState = !rightState;
     }
     setRightTurn(rightState);
-  } else {
-    leftState = false; // Set both states back to off
-    rightState = false;
   }
 
   pixels.show();
