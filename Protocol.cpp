@@ -57,10 +57,10 @@ struct info_t {
   uint32_t runTime;
 } __attribute__((packed)) info;
 
-struct imu_t {
-  uint16_t acc;
-  uint16_t gyro;
-  uint16_t kalman;
+struct imu_t { // Note that this can be negative as well
+  int16_t acc;
+  int16_t gyro;
+  int16_t kalman;
 } __attribute__((packed)) imu;
 
 #define SET_PID     0
