@@ -55,7 +55,8 @@ void loop() {
       setRightTurn(turnSignalState);
   } else if (turning) {
     turning = false;
-    delay(250 - (int32_t)(millis() - timer));
+    uint32_t now = millis();
+    delay(250 - (now > timer ? now - timer : 0)); // Make sure now is larger
     timer = millis(); // Reset timer
     turnSignalState = false; // Set LED state back to off
   }
