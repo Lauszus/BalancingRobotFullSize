@@ -1,4 +1,4 @@
-/* Copyright (C) 2013-2014 Kristian Lauszus, TKJ Electronics. All rights reserved.
+/* Copyright (C) 2014 Kristian Sloth Lauszus. All rights reserved.
 
  This software may be distributed and modified under the terms of the GNU
  General Public License version 2 (GPL2) as published by the Free Software
@@ -10,9 +10,9 @@
  Contact information
  -------------------
 
- Kristian Lauszus, TKJ Electronics
- Web      :  http://www.tkjelectronics.com
- e-mail   :  kristianl@tkjelectronics.com
+ Kristian Sloth Lauszus
+ Web      :  http://www.lauszus.com
+ e-mail   :  lauszus@gmail.com
 */
 
 #ifndef _eepromanything_h_
@@ -23,7 +23,7 @@
 // Source: http://playground.arduino.cc/Code/EEPROMWriteAnything
 // Modified to use the standard EEPROM library and added 'eeprom_busy_wait()'
 // Also added EEPROM_updateAnything to limit number of write/erase cycles
-// By: Krisitan Lauszus, TKJ Electronics
+// By: Krisitan Sloth Lauszus
 
 template <class T> uint16_t EEPROM_writeAnything(uint16_t addr, const T& value) {
   eeprom_busy_wait(); // Wait until the EEPROM is ready

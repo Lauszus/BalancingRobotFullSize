@@ -1,5 +1,5 @@
 # Balancing robot full size
-#### Developed by Kristian Lauszus and Mads Friis Bornebusch, 2014
+#### Developed by Kristian Sloth Lauszus and Mads Friis Bornebusch, 2014
 
 The code is released under the GNU General Public License.
 _________
@@ -12,4 +12,4 @@ I have also written an Android application for the robot. The source code is ava
 
 Detailed information can be found at the blog post: <http://blog.tkjelectronics.dk/2014/07/full-size-diy-balancing-robot/>.
 
-For more information send me an email at <kristianl@tkjelectronics.dk>.
+For more information send me an email at <lauszus@gmail.com>.
