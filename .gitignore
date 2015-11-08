@@ -1,1 +1,6 @@
 build/
+OldVersions/
+*.gcode
+*.gco
+*.iam
+lockfile.lck
