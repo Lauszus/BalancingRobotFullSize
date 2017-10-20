@@ -10,6 +10,8 @@ Both our paper and poster can be found inside the [Documents](Documents) directo
 
 Detailed information can be found at the blog post: <http://blog.tkjelectronics.dk/2014/07/full-size-diy-balancing-robot/>.
 
+<a href="https://www.youtube.com/watch?v=80EKp2fpPDo" target="_blank"><img src="http://img.youtube.com/vi/80EKp2fpPDo/0.jpg" width="400" height="300" border="10" /></a>
+
 ## Android application
 
 <a href="https://play.google.com/store/apps/details?id=com.lauszus.balancingrobotfullsizeandroid.app"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" alt="Google Play" width="200px"/></a>
