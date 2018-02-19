@@ -88,6 +88,18 @@ void sendData(uint8_t *data, uint8_t length);
 uint8_t getCheckSum(uint8_t *data, size_t length);
 
 void initSerial() {
+  // Automatically configure the Bluetooth module the first time it is turned on
+  if (cfg.configureBtModule) {
+    cfg.configureBtModule = false;
+    updateEEPROMValues();
+
+    Serial.begin(9600);
+    Serial.println("AT+NAMESegway"); // Set the name to 'Segway'
+    delay(1000); // The module waits 1 s before it considers a message complete
+    Serial.println("AT+PIN0000"); // Set the pin to '0000'
+    delay(1000); // The module waits 1 s before it considers a message complete
+    Serial.println("AT+BAUD7"); // Finally change the baud rate to '57600'
+  }
   Serial.begin(57600);
   Serial.setTimeout(10); // Only wait 10ms for serial data
 }
