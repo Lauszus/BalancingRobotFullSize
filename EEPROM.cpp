@@ -22,7 +22,7 @@
 cfg_t cfg; //  Struct for all the configuration values
 
 //static const char *firmwareVersion = "1.0.0";
-static const uint8_t eepromVersion = 2; // EEPROM version - used to restore the EEPROM values if the configuration struct have changed
+static const uint8_t eepromVersion = 3; // EEPROM version - used to restore the EEPROM values if the configuration struct have changed
 
 /* EEPROM Address Definitions */
 static const uint8_t versionAddr = 0; // Set the first byte to the EEPROM version
@@ -71,6 +71,8 @@ void restoreEEPROMValues() {
 
   cfg.accYzero = cfg.accZzero = 0;
   cfg.leftMotorScaler = cfg.rightMotorScaler = 1;
+
+  cfg.configureBtModule = true;
 
   updateEEPROMValues();
 }

@@ -29,6 +29,8 @@ typedef struct {
   // TODO: Implement this:
   double accYzero, accZzero; // Accelerometer zero values
   double leftMotorScaler, rightMotorScaler; // Used if there is difference between the motors
+
+  bool configureBtModule; // Used to configure the Bluetooth module the first time it is turned on
 } cfg_t;
 
 extern cfg_t cfg;
