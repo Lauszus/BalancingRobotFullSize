@@ -57,10 +57,10 @@ struct info_t {
   uint32_t runTime;
 } __attribute__((packed)) info;
 
-struct imu_t {
-  uint16_t acc;
-  uint16_t gyro;
-  uint16_t kalman;
+struct imu_t { // Note that this can be negative as well
+  int16_t acc;
+  int16_t gyro;
+  int16_t kalman;
 } __attribute__((packed)) imu;
 
 #define SET_PID     0
@@ -316,7 +316,7 @@ void parseSerialData() {
     info.speed = constrain(abs(PIDValue), 0, 100.0) * 100.0;
     if (deadmanButton::IsSet()) {
       double CS = ((double)analogRead(CS1_PIN) / 204.6 - 2.5) / 0.066 * 100.0; // 66mV/A and then multiply by 100.0
-      CS -= ((double)analogRead(CS2_PIN) / 204.6 - 2.5) / 0.066 * 100.0; // The motors turn opposite, so we need to subtract the value
+      //CS -= ((double)analogRead(CS2_PIN) / 204.6 - 2.5) / 0.066 * 100.0; // The motors turn opposite, so we need to subtract the value
       info.current = CS;
     } else
       info.current = 0; // When the reset button is held low on the motor drivers, the current sensor will give out an incorrect value

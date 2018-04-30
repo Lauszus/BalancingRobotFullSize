@@ -25,8 +25,8 @@ void setPWM(Command motor, uint16_t dutyCycle);
 
 void initMotors() {
   /* Set the motor driver diagnostic pins to inputs */
-  leftF1::SetDirRead();
-  leftF2::SetDirRead();
+  /*leftF1::SetDirRead();
+  leftF2::SetDirRead();*/
   rightF1::SetDirRead();
   rightF2::SetDirRead();
 

@@ -71,6 +71,10 @@ void setup() {
 
   zeroTurning = getTurning(); // Calibrate turning
 
+  /* Set turning pins used for turning signals */
+  turningLeft::SetDirWrite();
+  turningRight::SetDirWrite();
+
   /* Beep to indicate that it is now ready */
   buzzer::Set();
   delay(100);
@@ -82,24 +86,20 @@ void setup() {
 }
 
 void loop () {
-#if 0
-  if (leftF1::IsSet() || leftF2::IsSet() || rightF1::IsSet() || rightF2::IsSet()) { // Check the diagnostic pins
-    buzzer::Set();
-    Serial.print(F("Diagnostic error: "));
-    Serial.print(leftF1::IsSet());
-    Serial.write('\t');
-    Serial.print(leftF2::IsSet());
-    Serial.write('\t');
-    Serial.print(rightF1::IsSet());
-    Serial.write('\t');
-    Serial.println(rightF2::IsSet());
-  }
-#endif
-
   if (dataReady::IsSet()) { // Check is new data is ready
     updateAngle();
 
     turningValue = getTurning() - zeroTurning; // Update turning value
+
+    /* Set turning signals */
+    static bool turning; // Used for a deadband in the middle, so the LEDs do not flicker
+    if (abs(turningValue) > 5)
+      turning = true;
+    else if (abs(turningValue) < 1)
+      turning = false;
+
+    turningLeft::Set(turning && turningValue > 1);
+    turningRight::Set(turning && turningValue < -1);
 
     /* Drive motors */
     uint32_t timer = micros();

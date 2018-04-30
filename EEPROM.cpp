@@ -15,6 +15,8 @@
  e-mail   :  lauszus@gmail.com
 */
 
+#include <stdint.h> // Needed for uint8_t, uint16_t etc.
+
 #include "EEPROM.h"
 #include "EEPROMAnything.h"
 #include "IMU.h"
