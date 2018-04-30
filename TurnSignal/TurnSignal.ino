@@ -43,10 +43,11 @@ void loop() {
 
   bool turningLeft = digitalRead(turningLeftPin);
   bool turningRight = digitalRead(turningRightPin);
+  uint32_t now = millis();
   if (turningLeft || turningRight) {
     turning = true;
-    if ((int32_t)(millis() - timer) > 250) { // Blink every 250 ms
-      timer = millis();
+    if ((int32_t)(now - timer) > 250) { // Blink every 250 ms
+      timer = now;
       turnSignalState = !turnSignalState;
     }
     if (turningLeft)
@@ -55,9 +56,8 @@ void loop() {
       setRightTurn(turnSignalState);
   } else if (turning) {
     turning = false;
-    uint32_t now = millis();
     delay(250 - min((now > timer ? now - timer : 0), 250)); // Make sure now is larger and the difference is no more than 250
-    timer = millis(); // Reset timer
+    timer = now; // Reset timer
     turnSignalState = false; // Set LED state back to off
   }
 
